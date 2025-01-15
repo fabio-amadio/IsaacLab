@@ -13,6 +13,7 @@
 # **/*.usda
 # **/*.usdc
 # **/*.usdz
+**/*.asset_hash
 
 # Python
 .DS_Store
