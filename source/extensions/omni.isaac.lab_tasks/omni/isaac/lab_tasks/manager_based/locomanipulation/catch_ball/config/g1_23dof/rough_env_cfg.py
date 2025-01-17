@@ -139,7 +139,7 @@ class G1dof23CatchBallRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.commands.base_velocity.ranges.lin_vel_y = (-0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
 
-        # terminations
+        # # terminations
         # self.terminations.base_contact.params["sensor_cfg"].body_names = ["torso_link", ".*_hand"]
 
 
