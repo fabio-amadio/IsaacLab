@@ -182,6 +182,24 @@ def ball_close_to_hands_exp(
         / std**2
     )
 
+def ball_speed_when_grasped(
+    env,
+    std: float,
+    ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Penalize ball velocity when grasped (SE kernel used to filter with ball-robot distance)."""
+    # extract the used quantities (to enable type-hinting)
+    ball = env.scene[ball_cfg.name]
+    robot = env.scene[robot_cfg.name]
+    ball_pos = ball.data.root_link_pos_w
+    ball_vel = ball.data.root_link_lin_vel_w
+    robot_pos = robot.data.root_link_pos_w
+    ball_to_robot_pos = ball_pos - robot_pos
+    distance_filt = torch.exp(-torch.square(ball_to_robot_pos).sum(dim=1) / std**2)
+    return distance_filt * ball_vel.norm(dim=1)
+
+
 
 def dropping_ball(
     env,

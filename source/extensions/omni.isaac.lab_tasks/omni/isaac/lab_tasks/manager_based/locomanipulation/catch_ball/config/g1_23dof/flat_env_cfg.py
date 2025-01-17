@@ -31,6 +31,7 @@ class G1dof23CatchBallFlatEnvCfg(G1dof23CatchBallRoughEnvCfg):
         self.rewards.dof_acc_l2.weight = -1.0e-7
         self.rewards.feet_air_time.weight = 0.75
         self.rewards.feet_air_time.params["threshold"] = 0.4
+        self.rewards.feet_slide.weight = -0.1
         self.rewards.dof_torques_l2.weight = -2.0e-6
         self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
@@ -47,7 +48,7 @@ class G1dof23CatchBallFlatEnvCfg_PLAY(G1dof23CatchBallFlatEnvCfg):
         super().__post_init__()
 
         # make a smaller scene for play
-        self.scene.num_envs = 50
+        self.scene.num_envs = 8
         self.scene.env_spacing = 2.5
         # disable randomization for play
         self.observations.policy.enable_corruption = False

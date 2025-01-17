@@ -5,6 +5,7 @@
 
 from omni.isaac.lab.managers import RewardTermCfg as RewTerm
 from omni.isaac.lab.managers import SceneEntityCfg
+from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
 from omni.isaac.lab.utils import configclass
 
 import omni.isaac.lab_tasks.manager_based.locomanipulation.catch_ball.mdp as mdp
@@ -32,22 +33,28 @@ class G1dof23CatchBallRewards(RewardsCfg):
         params={"command_name": "base_velocity", "std": 0.5},
     )
     track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_world_exp, weight=2.0, params={"command_name": "base_velocity", "std": 0.5}
+        func=mdp.track_ang_vel_z_world_exp,
+        weight=2.0,
+        params={"command_name": "base_velocity", "std": 0.5},
     )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
         weight=0.25,
         params={
             "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll_link"),
-            "threshold": 0.4,
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=".*_ankle_roll_link"
+            ),
+            "threshold": 0.4, 
         },
     )
     feet_slide = RewTerm(
         func=mdp.feet_slide,
         weight=-0.1,
         params={
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll_link"),
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=".*_ankle_roll_link"
+            ),
             "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll_link"),
         },
     )
@@ -56,13 +63,21 @@ class G1dof23CatchBallRewards(RewardsCfg):
     dof_pos_limits = RewTerm(
         func=mdp.joint_pos_limits,
         weight=-1.0,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"])},
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot", joint_names=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"]
+            )
+        },
     )
     # Penalize deviation from default of the joints that are not essential for locomotion
     joint_deviation_hip = RewTerm(
         func=mdp.joint_deviation_l1,
         weight=-0.1,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[".*_hip_yaw_joint", ".*_hip_roll_joint"])},
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot", joint_names=[".*_hip_yaw_joint", ".*_hip_roll_joint"]
+            )
+        },
     )
     joint_deviation_arms = RewTerm(
         func=mdp.joint_deviation_l1,
@@ -119,7 +134,9 @@ class G1dof23CatchBallRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.push_robot = None
         self.events.add_base_mass = None
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = ["torso_link"]
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = [
+            "torso_link"
+        ]
         # Rewards
         self.rewards.lin_vel_z_l2.weight = 0.0
         self.rewards.undesired_contacts = None
@@ -142,6 +159,20 @@ class G1dof23CatchBallRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # # terminations
         # self.terminations.base_contact.params["sensor_cfg"].body_names = ["torso_link", ".*_hand"]
 
+        # # ------ DEACTIVATE BALL-RELATED TERMS ------
+        # self.scene.ball = None
+        # self.observations.policy.ball_pos = ObsTerm(
+        #     func=mdp.dummy_zero_obs, params={"dim": 3}
+        # )
+        # self.observations.policy.ball_vel = ObsTerm(
+        #     func=mdp.dummy_zero_obs, params={"dim": 3}
+        # )
+        # self.rewards.ball_close_to_body = None
+        # self.rewards.ball_close_to_hands = None
+        # self.rewards.dropping_ball = None
+        # self.events.reset_ball = None
+        # self.terminations.ball_dropped
+
 
 @configclass
 class G1dof23CatchBallRoughEnvCfg_PLAY(G1dof23CatchBallRoughEnvCfg):
@@ -150,7 +181,7 @@ class G1dof23CatchBallRoughEnvCfg_PLAY(G1dof23CatchBallRoughEnvCfg):
         super().__post_init__()
 
         # make a smaller scene for play
-        self.scene.num_envs = 50
+        self.scene.num_envs = 8
         self.scene.env_spacing = 2.5
         self.episode_length_s = 40.0
         # spawn the robot randomly in the grid (instead of their terrain levels)

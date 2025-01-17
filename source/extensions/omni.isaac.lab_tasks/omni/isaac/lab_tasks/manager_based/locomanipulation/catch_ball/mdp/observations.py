@@ -62,3 +62,11 @@ def ball_vel_in_robot_frame(
     ball_to_robot_vel = ball_vel_w - robot_vel_w
 
     return ball_to_robot_vel
+
+def dummy_zero_obs(
+    env: ManagerBasedRLEnv,
+    dim: int,
+) -> torch.Tensor:
+    """Dummy zero observations."""
+
+    return torch.zeros(env.num_envs, dim, device=env.device)

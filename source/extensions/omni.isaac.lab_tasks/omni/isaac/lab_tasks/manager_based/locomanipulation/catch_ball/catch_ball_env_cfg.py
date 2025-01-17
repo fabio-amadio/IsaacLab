@@ -319,6 +319,9 @@ class RewardsCfg:
     dropping_ball = RewTerm(
         func=mdp.dropping_ball, weight=-0.5, params={"threshold": 0.2}
     )
+    ball_speed_when_grasped = RewTerm(
+        func=mdp.ball_speed_when_grasped, weight=-0.2, params={"std": 0.25}
+    )
     # -- optional penalties
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0.0)
@@ -329,15 +332,13 @@ class TerminationsCfg:
     """Termination terms for the MDP."""
 
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    # base_contact = DoneTerm(
-    #     func=mdp.illegal_contact,
-    #     params={
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names="base"),
-    #         "threshold": 1.0,
-    #     },
-    # )
     falling = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": 0.5, "asset_cfg": SceneEntityCfg("robot")}
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": 0.5, "asset_cfg": SceneEntityCfg("robot")},
+    )
+    ball_dropped = DoneTerm(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": 0.3, "asset_cfg": SceneEntityCfg("ball")},
     )
 
 
