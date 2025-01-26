@@ -43,19 +43,22 @@ class G1CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 @configclass
 class G1OnlyWalkRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
-    experiment_name = "g1_only_walk_rough"
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_only_walk_rough"
 
 
 @configclass
 class G1StandingCatchBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
-    experiment_name = "g1_standing_ball_catch_rough"
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_standing_ball_catch_rough"
 
 
 @configclass
 class G1CatchBallFlatPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-
         self.max_iterations = 1500
         self.experiment_name = "g1_ball_catch_flat"
         self.policy.actor_hidden_dims = [256, 128, 128]
@@ -64,9 +67,13 @@ class G1CatchBallFlatPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
 
 @configclass
 class G1OnlyWalkFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
-    experiment_name = "g1_only_walk_flat"
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_only_walk_flat"
 
 
 @configclass
 class G1StandingCatchBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
-    experiment_name = "g1_standing_ball_catch_flat"
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_standing_ball_catch_flat"
