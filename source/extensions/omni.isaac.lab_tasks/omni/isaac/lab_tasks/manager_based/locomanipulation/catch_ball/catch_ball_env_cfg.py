@@ -9,7 +9,12 @@ from dataclasses import MISSING
 import omni.isaac.lab.sim as sim_utils
 from omni.isaac.lab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
 from omni.isaac.lab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg
-from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
+from omni.isaac.lab.assets import (
+    ArticulationCfg,
+    AssetBaseCfg,
+    RigidObjectCfg,
+    DeformableObjectCfg,
+)
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
 from omni.isaac.lab.managers import EventTermCfg as EventTerm
@@ -91,16 +96,31 @@ class MySceneCfg(InteractiveSceneCfg):
     ball: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Ball",
         spawn=sim_utils.SphereCfg(
-            radius=0.10,
+            radius=0.08,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.5),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.4),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.3, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
+            pos=(0.35, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
         ),
     )
+
+    # ball: DeformableObjectCfg = DeformableObjectCfg(
+    #     prim_path="{ENV_REGEX_NS}/Ball",
+    #     spawn=sim_utils.MeshSphereCfg(
+    #         radius=0.10,
+    #         deformable_props=sim_utils.DeformableBodyPropertiesCfg(rest_offset=0.0, contact_offset=0.001),
+    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.5),
+    #         physics_material=sim_utils.DeformableBodyMaterialCfg(poissons_ratio=0.45, youngs_modulus=5e6),
+    #         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
+    #     ),
+    #     init_state=RigidObjectCfg.InitialStateCfg(
+    #         pos=(0.3, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
+    #     ),
+    #     debug_vis=True,
+    # )
 
 
 ##
@@ -171,8 +191,14 @@ class ObservationsCfg:
             noise=Unoise(n_min=-0.1, n_max=0.1),
             clip=(-1.0, 1.0),
         )
-        ball_pos = ObsTerm(func=mdp.ball_pos_in_robot_frame)
-        ball_vel = ObsTerm(func=mdp.ball_vel_in_robot_frame)
+        ball_pos = ObsTerm(
+            func=mdp.ball_pos_in_robot_frame, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        ball_vel = ObsTerm(
+            func=mdp.ball_vel_in_robot_frame, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        # ball_pos = ObsTerm(func=mdp.deformable_ball_pos_in_robot_frame)
+        # ball_vel = ObsTerm(func=mdp.deformable_ball_vel_in_robot_frame)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -296,12 +322,7 @@ class RewardsCfg:
             "threshold": 0.5,
         },
     )
-    ball_close_to_body = RewTerm(
-        func=mdp.ball_close_to_body_exp, weight=2.0, params={"std": 0.5}
-    )
-    ball_close_to_hands = RewTerm(
-        func=mdp.ball_close_to_hands_exp, weight=2.0, params={"std": 0.5}
-    )
+
     # -- penalties
     lin_vel_z_l2 = RewTerm(func=mdp.lin_vel_z_l2, weight=-2.0)
     ang_vel_xy_l2 = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
@@ -315,12 +336,6 @@ class RewardsCfg:
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*THIGH"),
             "threshold": 1.0,
         },
-    )
-    dropping_ball = RewTerm(
-        func=mdp.dropping_ball, weight=-0.5, params={"threshold": 0.2}
-    )
-    ball_speed_when_grasped = RewTerm(
-        func=mdp.ball_speed_when_grasped, weight=-0.2, params={"std": 0.25}
     )
     # -- optional penalties
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
@@ -347,6 +362,7 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
+    # TODO: add ball-related curriculum terms
 
 
 ##
@@ -355,7 +371,7 @@ class CurriculumCfg:
 
 
 @configclass
-class LocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
+class CatchBallAndLocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings

@@ -16,7 +16,7 @@ from typing import TYPE_CHECKING
 
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.sensors import ContactSensor
-from omni.isaac.lab.utils.math import quat_rotate_inverse, yaw_quat
+from omni.isaac.lab.utils.math import quat_rotate_inverse, yaw_quat, matrix_from_quat
 
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedRLEnv
@@ -169,11 +169,27 @@ def ball_close_to_hands_exp(
     left_hand_pos = robot.data.body_link_pos_w[
         :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
     ]
+    left_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
+    ]
+    left_hand_rot_mat = matrix_from_quat(left_hand_rot)
+    left_palm_pos = left_hand_pos + left_hand_rot_mat @ torch.tensor(
+        [0.17, 0.0, 0.0], device=env.device
+    )
+
     right_hand_pos = robot.data.body_link_pos_w[
         :, robot.body_names.index("right_wrist_roll_rubber_hand"), :
     ]
-    ball_to_left_pos = ball_pos - left_hand_pos
-    ball_to_right_pos = ball_pos - right_hand_pos
+    right_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("right_wrist_roll_rubber_hand"), :
+    ]
+    right_hand_rot_mat = matrix_from_quat(right_hand_rot)
+    right_palm_pos = right_hand_pos + right_hand_rot_mat @ torch.tensor(
+        [0.17, 0.0, 0.0], device=env.device
+    )
+
+    ball_to_left_pos = ball_pos - left_palm_pos
+    ball_to_right_pos = ball_pos - right_palm_pos
     return torch.exp(
         (
             -torch.square(ball_to_left_pos).sum(dim=1)
@@ -182,23 +198,16 @@ def ball_close_to_hands_exp(
         / std**2
     )
 
-def ball_speed_when_grasped(
+
+def ball_speed(
     env,
-    std: float,
     ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
-    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
     """Penalize ball velocity when grasped (SE kernel used to filter with ball-robot distance)."""
     # extract the used quantities (to enable type-hinting)
     ball = env.scene[ball_cfg.name]
-    robot = env.scene[robot_cfg.name]
-    ball_pos = ball.data.root_link_pos_w
     ball_vel = ball.data.root_link_lin_vel_w
-    robot_pos = robot.data.root_link_pos_w
-    ball_to_robot_pos = ball_pos - robot_pos
-    distance_filt = torch.exp(-torch.square(ball_to_robot_pos).sum(dim=1) / std**2)
-    return distance_filt * ball_vel.norm(dim=1)
-
+    return ball_vel.norm(dim=1)
 
 
 def dropping_ball(
@@ -211,3 +220,47 @@ def dropping_ball(
     ball = env.scene[ball_cfg.name]
     ball_pos = ball.data.root_link_pos_w
     return (ball_pos[:, 2] < threshold).float()
+
+
+def angular_momentum_exp(
+    env,
+    std: float,
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Reward small angular momentum."""
+    # extract the used quantities (to enable type-hinting)
+    robot = env.scene[robot_cfg.name]
+    # Default masses. Shape is (num_instances, num_bodies).
+    body_masses = robot.data.default_mass.to(env.device)
+    # Default inertias. Shape is (num_instances, num_bodies, 9).
+    body_inertias = robot.data.default_inertia.to(env.device)
+    # State of all bodies CoM [pos, quat, lin_vel, ang_vel] in world frame.
+    # Shape is (num_instances, num_bodies, 13).
+    body_com_states = robot.data.body_com_state_w.to(env.device)
+
+    # Compute the total angular momentum
+    angular_momentum = torch.zeros(
+        (robot.data.body_com_state_w.shape[0], 3), device=env.device
+    )
+    for i in range(robot.data.body_com_state_w.shape[1]):
+        mass = body_masses[:, i].unsqueeze(-1)
+        inertia = body_inertias[:, i].view(-1, 3, 3)
+        com_pos = body_com_states[:, i, :3]
+        com_ang_vel = body_com_states[:, i, 10:13]
+        com_lin_vel = body_com_states[:, i, 7:10]
+
+        # Compute linear momentum
+        lin_momentum = mass * com_lin_vel
+
+        # Compute angular momentum
+        ang_momentum = torch.cross(com_pos, lin_momentum) + torch.bmm(
+            inertia, com_ang_vel.unsqueeze(-1)
+        ).squeeze(-1)
+
+        # Sum the angular momentum of all bodies
+        angular_momentum += ang_momentum
+
+    # print("## mean angular_momentum: ", torch.mean(torch.norm(angular_momentum, dim=1)))
+    # print("## mean reward: ", torch.mean(torch.exp(-torch.norm(angular_momentum, dim=1) / std**2)))
+
+    return torch.exp(-torch.norm(angular_momentum, dim=1) / std**2)

@@ -13,11 +13,11 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
 
 
 @configclass
-class G1dof23CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class G1CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 50
-    experiment_name = "g1_23dof_ball_catch_rough"
+    experiment_name = "g1_ball_catch_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -42,11 +42,31 @@ class G1dof23CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 
 @configclass
-class G1dof23CatchBallFlatPPORunnerCfg(G1dof23CatchBallRoughPPORunnerCfg):
+class G1OnlyWalkRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+    experiment_name = "g1_only_walk_rough"
+
+
+@configclass
+class G1StandingCatchBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+    experiment_name = "g1_standing_ball_catch_rough"
+
+
+@configclass
+class G1CatchBallFlatPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
         self.max_iterations = 1500
-        self.experiment_name = "g1_23dof_ball_catch_flat"
+        self.experiment_name = "g1_ball_catch_flat"
         self.policy.actor_hidden_dims = [256, 128, 128]
         self.policy.critic_hidden_dims = [256, 128, 128]
+
+
+@configclass
+class G1OnlyWalkFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+    experiment_name = "g1_only_walk_flat"
+
+
+@configclass
+class G1StandingCatchBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+    experiment_name = "g1_standing_ball_catch_flat"

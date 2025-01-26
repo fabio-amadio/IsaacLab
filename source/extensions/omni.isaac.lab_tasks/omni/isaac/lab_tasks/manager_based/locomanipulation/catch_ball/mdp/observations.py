@@ -8,7 +8,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from omni.isaac.lab.assets import RigidObject
+from omni.isaac.lab.assets import RigidObject, DeformableObject
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.utils.math import quat_mul, quat_inv
 
@@ -26,6 +26,22 @@ def ball_pos_in_robot_frame(
     robot: RigidObject = env.scene[robot_cfg.name]
 
     ball_pos_w = ball.data.root_link_pos_w
+    robot_pos_w = robot.data.root_link_pos_w
+    ball_to_robot_pos = ball_pos_w - robot_pos_w
+
+    return ball_to_robot_pos
+
+
+def deformable_ball_pos_in_robot_frame(
+    env: ManagerBasedRLEnv,
+    ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """The position of the deformable ball in the robot frame."""
+    ball: DeformableObject = env.scene[ball_cfg.name]
+    robot: RigidObject = env.scene[robot_cfg.name]
+
+    ball_pos_w = ball.data.root_pos_w
     robot_pos_w = robot.data.root_link_pos_w
     ball_to_robot_pos = ball_pos_w - robot_pos_w
 
@@ -62,6 +78,23 @@ def ball_vel_in_robot_frame(
     ball_to_robot_vel = ball_vel_w - robot_vel_w
 
     return ball_to_robot_vel
+
+
+def deformable_ball_vel_in_robot_frame(
+    env: ManagerBasedRLEnv,
+    ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """The velocity of the deformable ball in the robot frame."""
+    ball: DeformableObject = env.scene[ball_cfg.name]
+    robot: RigidObject = env.scene[robot_cfg.name]
+
+    ball_vel_w = ball.data.root_vel_w
+    robot_vel_w = robot.data.root_link_pos_w
+    ball_to_robot_vel = ball_vel_w - robot_vel_w
+
+    return ball_to_robot_vel
+
 
 def dummy_zero_obs(
     env: ManagerBasedRLEnv,
