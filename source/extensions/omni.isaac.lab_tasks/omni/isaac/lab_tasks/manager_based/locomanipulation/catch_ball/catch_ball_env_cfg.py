@@ -96,31 +96,16 @@ class MySceneCfg(InteractiveSceneCfg):
     ball: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Ball",
         spawn=sim_utils.SphereCfg(
-            radius=0.08,
+            radius=0.06,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.4),
             collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.1, 0.0)),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.35, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
         ),
     )
-
-    # ball: DeformableObjectCfg = DeformableObjectCfg(
-    #     prim_path="{ENV_REGEX_NS}/Ball",
-    #     spawn=sim_utils.MeshSphereCfg(
-    #         radius=0.10,
-    #         deformable_props=sim_utils.DeformableBodyPropertiesCfg(rest_offset=0.0, contact_offset=0.001),
-    #         mass_props=sim_utils.MassPropertiesCfg(mass=0.5),
-    #         physics_material=sim_utils.DeformableBodyMaterialCfg(poissons_ratio=0.45, youngs_modulus=5e6),
-    #         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
-    #     ),
-    #     init_state=RigidObjectCfg.InitialStateCfg(
-    #         pos=(0.3, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
-    #     ),
-    #     debug_vis=True,
-    # )
 
 
 ##
@@ -197,8 +182,6 @@ class ObservationsCfg:
         ball_vel = ObsTerm(
             func=mdp.ball_vel_in_robot_frame, noise=Unoise(n_min=-0.01, n_max=0.01)
         )
-        # ball_pos = ObsTerm(func=mdp.deformable_ball_pos_in_robot_frame)
-        # ball_vel = ObsTerm(func=mdp.deformable_ball_vel_in_robot_frame)
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -213,7 +196,7 @@ class EventCfg:
     """Configuration for events."""
 
     # startup
-    physics_material = EventTerm(
+    robot_physics_material = EventTerm(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
@@ -231,6 +214,28 @@ class EventCfg:
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names="base"),
             "mass_distribution_params": (-5.0, 5.0),
+            "operation": "add",
+        },
+    )
+
+    ball_physics_material = EventTerm(
+        func=mdp.randomize_rigid_body_material,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("ball", body_names=".*"),
+            "static_friction_range": (0.4, 0.6),
+            "dynamic_friction_range": (0.3, 0.5),
+            "restitution_range": (0.0, 0.0),
+            "num_buckets": 64,
+        },
+    )
+
+    ball_physics_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "mass_distribution_params": (-0.1, 0.1),
             "operation": "add",
         },
     )

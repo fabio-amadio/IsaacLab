@@ -34,8 +34,8 @@ class G1CatchBallFlatEnvCfg(G1CatchBallRoughEnvCfg):
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.dof_acc_l2.weight = -1.0e-7
         self.rewards.feet_air_time.weight = 1.0
-        self.rewards.feet_air_time.params["threshold"] = 0.5
-        self.rewards.feet_slide.weight = -0.2
+        self.rewards.feet_air_time.params["threshold"] = 0.7
+        self.rewards.feet_slide.weight = -0.5
         self.rewards.dof_torques_l2.weight = -2.0e-6
         self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
@@ -63,8 +63,8 @@ class G1OnlyWalkFlatEnvCfg(G1OnlyWalkRoughEnvCfg):
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.dof_acc_l2.weight = -1.0e-7
         self.rewards.feet_air_time.weight = 1.0
-        self.rewards.feet_air_time.params["threshold"] = 0.5
-        self.rewards.feet_slide.weight = -0.2
+        self.rewards.feet_air_time.params["threshold"] = 0.7
+        self.rewards.feet_slide.weight = -0.5
         self.rewards.dof_torques_l2.weight = -2.0e-6
         self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]

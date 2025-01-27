@@ -77,3 +77,31 @@ class G1StandingCatchBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
         self.experiment_name = "g1_standing_ball_catch_flat"
+
+
+@configclass
+class G1CatchSoftBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_soft_ball_catch_rough"
+
+
+@configclass
+class G1StandingCatchSoftBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_standing_soft_ball_catch_rough"
+
+
+@configclass
+class G1CatchSoftBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_soft_ball_catch_flat"
+
+
+@configclass
+class G1StandingCatchSoftBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+    def __post_init__(self):
+        super().__post_init__()
+        self.experiment_name = "g1_standing_soft_ball_catch_flat"

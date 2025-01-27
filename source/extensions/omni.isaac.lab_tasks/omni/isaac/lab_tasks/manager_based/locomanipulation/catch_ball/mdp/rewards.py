@@ -14,9 +14,15 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
+from omni.isaac.lab.assets import RigidObject, DeformableObject
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.sensors import ContactSensor
-from omni.isaac.lab.utils.math import quat_rotate_inverse, yaw_quat, matrix_from_quat
+from omni.isaac.lab.utils.math import (
+    quat_rotate_inverse,
+    yaw_quat,
+    matrix_from_quat,
+    quat_error_magnitude,
+)
 
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedRLEnv
@@ -139,6 +145,27 @@ def track_ang_vel_z_world_exp(
     return torch.exp(-ang_vel_error / std**2)
 
 
+def same_hands_orientation_exp(
+    env,
+    std: float,
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Reward the robot for keeping its hands in the same orientation using exponential kernel."""
+    robot = env.scene[robot_cfg.name]
+
+    left_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
+    ]
+    right_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("right_wrist_roll_rubber_hand"), :
+    ]
+
+    # Compute the difference in orientation between the hands using quaternion error magnitude
+    orientation_diff = quat_error_magnitude(left_hand_rot, right_hand_rot)
+
+    return torch.exp(-orientation_diff / std**2)
+
+
 def ball_close_to_body_exp(
     env,
     std: float,
@@ -147,7 +174,7 @@ def ball_close_to_body_exp(
 ) -> torch.Tensor:
     """Reward holding the ball close to the body using exponential kernel."""
     # extract the used quantities (to enable type-hinting)
-    ball = env.scene[ball_cfg.name]
+    ball: RigidObject = env.scene[ball_cfg.name]
     robot = env.scene[robot_cfg.name]
     ball_pos = ball.data.root_link_pos_w
     robot_pos = robot.data.root_link_pos_w
@@ -163,9 +190,53 @@ def ball_close_to_hands_exp(
 ) -> torch.Tensor:
     """Reward holding the ball in the robot's hand using exponential kernel."""
     # extract the used quantities (to enable type-hinting)
-    ball = env.scene[ball_cfg.name]
+    ball: RigidObject = env.scene[ball_cfg.name]
     robot = env.scene[robot_cfg.name]
     ball_pos = ball.data.root_link_pos_w
+    left_hand_pos = robot.data.body_link_pos_w[
+        :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
+    ]
+    left_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
+    ]
+    left_hand_rot_mat = matrix_from_quat(left_hand_rot)
+    left_palm_pos = left_hand_pos + left_hand_rot_mat @ torch.tensor(
+        [0.17, 0.0, 0.0], device=env.device
+    )
+
+    right_hand_pos = robot.data.body_link_pos_w[
+        :, robot.body_names.index("right_wrist_roll_rubber_hand"), :
+    ]
+    right_hand_rot = robot.data.body_link_quat_w[
+        :, robot.body_names.index("right_wrist_roll_rubber_hand"), :
+    ]
+    right_hand_rot_mat = matrix_from_quat(right_hand_rot)
+    right_palm_pos = right_hand_pos + right_hand_rot_mat @ torch.tensor(
+        [0.17, 0.0, 0.0], device=env.device
+    )
+
+    ball_to_left_pos = ball_pos - left_palm_pos
+    ball_to_right_pos = ball_pos - right_palm_pos
+    return torch.exp(
+        (
+            -torch.square(ball_to_left_pos).sum(dim=1)
+            - torch.square(ball_to_right_pos).sum(dim=1)
+        )
+        / std**2
+    )
+
+
+def soft_ball_close_to_hands_exp(
+    env,
+    std: float,
+    ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Reward holding the (soft) ball in the robot's hand using exponential kernel."""
+    # extract the used quantities (to enable type-hinting)
+    ball: DeformableObject = env.scene[ball_cfg.name]
+    robot = env.scene[robot_cfg.name]
+    ball_pos = ball.data.root_pos_w
     left_hand_pos = robot.data.body_link_pos_w[
         :, robot.body_names.index("left_wrist_roll_rubber_hand"), :
     ]

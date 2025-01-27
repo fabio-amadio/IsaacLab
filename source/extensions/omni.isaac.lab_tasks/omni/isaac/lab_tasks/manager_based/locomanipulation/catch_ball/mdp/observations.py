@@ -32,12 +32,12 @@ def ball_pos_in_robot_frame(
     return ball_to_robot_pos
 
 
-def deformable_ball_pos_in_robot_frame(
+def soft_ball_pos_in_robot_frame(
     env: ManagerBasedRLEnv,
     ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
     robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """The position of the deformable ball in the robot frame."""
+    """The position of the soft ball in the robot frame."""
     ball: DeformableObject = env.scene[ball_cfg.name]
     robot: RigidObject = env.scene[robot_cfg.name]
 
@@ -80,12 +80,12 @@ def ball_vel_in_robot_frame(
     return ball_to_robot_vel
 
 
-def deformable_ball_vel_in_robot_frame(
+def soft_ball_vel_in_robot_frame(
     env: ManagerBasedRLEnv,
     ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
     robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """The velocity of the deformable ball in the robot frame."""
+    """The velocity of the soft ball in the robot frame."""
     ball: DeformableObject = env.scene[ball_cfg.name]
     robot: RigidObject = env.scene[robot_cfg.name]
 

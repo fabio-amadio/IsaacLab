@@ -14,7 +14,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from omni.isaac.lab.assets import RigidObject
+from omni.isaac.lab.assets import RigidObject, DeformableObject
 from omni.isaac.lab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
@@ -22,7 +22,9 @@ if TYPE_CHECKING:
 
 
 def terrain_out_of_bounds(
-    env: ManagerBasedRLEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), distance_buffer: float = 3.0
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    distance_buffer: float = 3.0,
 ) -> torch.Tensor:
     """Terminate when the actor move too close to the edge of the terrain.
 
@@ -45,8 +47,29 @@ def terrain_out_of_bounds(
         asset: RigidObject = env.scene[asset_cfg.name]
 
         # check if the agent is out of bounds
-        x_out_of_bounds = torch.abs(asset.data.root_pos_w[:, 0]) > 0.5 * map_width - distance_buffer
-        y_out_of_bounds = torch.abs(asset.data.root_pos_w[:, 1]) > 0.5 * map_height - distance_buffer
+        x_out_of_bounds = (
+            torch.abs(asset.data.root_pos_w[:, 0]) > 0.5 * map_width - distance_buffer
+        )
+        y_out_of_bounds = (
+            torch.abs(asset.data.root_pos_w[:, 1]) > 0.5 * map_height - distance_buffer
+        )
         return torch.logical_or(x_out_of_bounds, y_out_of_bounds)
     else:
-        raise ValueError("Received unsupported terrain type, must be either 'plane' or 'generator'.")
+        raise ValueError(
+            "Received unsupported terrain type, must be either 'plane' or 'generator'."
+        )
+
+
+def soft_root_height_below_minimum(
+    env: ManagerBasedRLEnv,
+    minimum_height: float,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("asset"),
+) -> torch.Tensor:
+    """Terminate when the asset's root height is below the minimum height.
+
+    Note:
+        This is currently only supported for flat terrains, i.e. the minimum height is in the world frame.
+    """
+    # extract the used quantities (to enable type-hinting)
+    asset: DeformableObject = env.scene[asset_cfg.name]
+    return asset.data.root_pos_w[:, 2] < minimum_height
