@@ -60,6 +60,9 @@ def terrain_out_of_bounds(
         )
 
 
+"""Custom terminations"""
+
+
 def soft_root_height_below_minimum(
     env: ManagerBasedRLEnv,
     minimum_height: float,

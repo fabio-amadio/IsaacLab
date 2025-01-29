@@ -50,6 +50,50 @@ class G1BaseWalkRewards(RewardsCfg):
         },
     )
 
+    # Penalize base height distance from a given target
+    base_height_l2 = RewTerm(
+        func=mdp.base_height_l2,
+        weight=-0.25,
+        params={
+            "target_height": 0.73,
+        },
+    )
+
+    # Penalize uneven step times between the two feets
+    different_step_times = RewTerm(
+        func=mdp.different_step_times,
+        weight=-0.25,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=".*_ankle_roll_link"
+            ),
+        },
+    )
+    # Penalize too different feet air and contact times
+    different_air_contact_times = RewTerm(
+        func=mdp.different_air_contact_times,
+        weight=-0.25,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=".*_ankle_roll_link"
+            ),
+        },
+    )
+    # Penalize small swing feet height
+    feet_swing_height = RewTerm(
+        func=mdp.feet_swing_height,
+        weight=-0.1,
+        params={
+            "target_height": 0.15,
+            "sensor_cfg": SceneEntityCfg(
+                "contact_forces", body_names=".*_ankle_roll_link", preserve_order=True
+            ),
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll_link"),
+        },
+    )
+
     # Penalize sliding feet
     feet_slide = RewTerm(
         func=mdp.feet_slide,
