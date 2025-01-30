@@ -268,6 +268,15 @@ class EventCfg:
         },
     )
 
+    reset_robot_joints = EventTerm(
+        func=mdp.reset_joints_by_scale,
+        mode="reset",
+        params={
+            "position_range": (0.5, 1.5),
+            "velocity_range": (0.0, 0.0),
+        },
+    )
+
     reset_ball = EventTerm(
         func=mdp.reset_root_state_uniform,
         mode="reset",
@@ -282,15 +291,6 @@ class EventCfg:
                 "yaw": (0, 0),
             },
             "asset_cfg": SceneEntityCfg("ball"),
-        },
-    )
-
-    reset_robot_joints = EventTerm(
-        func=mdp.reset_joints_by_scale,
-        mode="reset",
-        params={
-            "position_range": (0.5, 1.5),
-            "velocity_range": (0.0, 0.0),
         },
     )
 

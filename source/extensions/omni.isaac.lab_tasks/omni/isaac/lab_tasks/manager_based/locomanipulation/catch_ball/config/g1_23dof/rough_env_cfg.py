@@ -26,18 +26,24 @@ from omni.isaac.lab_assets import G1_23DOF_RUBBER_HANDS_MINIMAL_CFG  # isort: sk
 @configclass
 class G1BaseWalkRewards(RewardsCfg):
     """Reward terms for the MDP."""
-
+    # High termination penalty
     termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
+
+    # Reward tracking linear velocity command
     track_lin_vel_xy_exp = RewTerm(
         func=mdp.track_lin_vel_xy_yaw_frame_exp,
         weight=1.0,
         params={"command_name": "base_velocity", "std": 0.5},
     )
+
+    # Reward tracking angular velocity command
     track_ang_vel_z_exp = RewTerm(
         func=mdp.track_ang_vel_z_world_exp,
         weight=2.0,
         params={"command_name": "base_velocity", "std": 0.5},
     )
+
+    # Reward high feet air time for biiped walking
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
         weight=0.25,
@@ -70,6 +76,7 @@ class G1BaseWalkRewards(RewardsCfg):
             ),
         },
     )
+
     # Penalize too different feet air and contact times
     different_air_contact_times = RewTerm(
         func=mdp.different_air_contact_times,
@@ -81,12 +88,14 @@ class G1BaseWalkRewards(RewardsCfg):
             ),
         },
     )
+
     # Penalize small swing feet height
     feet_swing_height = RewTerm(
         func=mdp.feet_swing_height,
         weight=-0.1,
         params={
-            "target_height": 0.15,
+            "command_name": "base_velocity",
+            "target_height": 0.18,
             "sensor_cfg": SceneEntityCfg(
                 "contact_forces", body_names=".*_ankle_roll_link", preserve_order=True
             ),
@@ -127,6 +136,7 @@ class G1BaseWalkRewards(RewardsCfg):
             )
         },
     )
+
     joint_deviation_arms = RewTerm(
         func=mdp.joint_deviation_l1,
         weight=-0.1,
@@ -143,6 +153,7 @@ class G1BaseWalkRewards(RewardsCfg):
             )
         },
     )
+
     joint_deviation_torso = RewTerm(
         func=mdp.joint_deviation_l1,
         weight=-0.1,
@@ -158,6 +169,7 @@ class G1CatchBallRewards(G1BaseWalkRewards):
     ball_close_to_hands = RewTerm(
         func=mdp.ball_close_to_hands_exp, weight=1.0, params={"std": 0.6}
     )
+
     # Reward for keeping the hands orientation consistent
     same_hands_orientation = RewTerm(
         func=mdp.same_hands_orientation_exp, weight=1.0, params={"std": 0.4}
@@ -171,6 +183,7 @@ class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+
         # Scene
         self.scene.robot = G1_23DOF_RUBBER_HANDS_MINIMAL_CFG.replace(
             prim_path="{ENV_REGEX_NS}/Robot",
@@ -193,6 +206,7 @@ class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
         self.events.base_external_force_torque.params["asset_cfg"].body_names = [
             "torso_link"
         ]
+
         # Rewards
         self.rewards.undesired_contacts = None
         self.rewards.flat_orientation_l2.weight = -1.0
@@ -217,6 +231,7 @@ class G1OnlyWalkRoughEnvCfg(G1CatchBallRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+
         # set the only walk rewards
         self.rewards: G1BaseWalkRewards = G1BaseWalkRewards()
         self.rewards.undesired_contacts = None
@@ -230,8 +245,10 @@ class G1OnlyWalkRoughEnvCfg(G1CatchBallRoughEnvCfg):
         self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
         )
+
         # remove ball from the scene
         self.scene.ball = None
+        
         # remove ball-related settings
         self.observations.policy.ball_pos = ObsTerm(
             func=mdp.dummy_zero_obs,
@@ -254,6 +271,7 @@ class G1StandingCatchBallRoughEnvCfg(G1CatchBallRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+
         # set null velocity commands
         self.commands.base_velocity.ranges.lin_vel_x = (0, 0)
         self.commands.base_velocity.ranges.lin_vel_y = (0, 0)
