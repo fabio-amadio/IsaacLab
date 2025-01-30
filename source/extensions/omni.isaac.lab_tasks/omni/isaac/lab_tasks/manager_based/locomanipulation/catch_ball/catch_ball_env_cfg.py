@@ -59,6 +59,7 @@ class MySceneCfg(InteractiveSceneCfg):
             restitution_combine_mode="multiply",
             static_friction=1.0,
             dynamic_friction=1.0,
+            restitution=1.0,
         ),
         visual_material=sim_utils.MdlFileCfg(
             mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
@@ -95,17 +96,47 @@ class MySceneCfg(InteractiveSceneCfg):
     # ball
     ball: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Ball",
-        spawn=sim_utils.SphereCfg(
-            radius=0.06,
+        spawn=sim_utils.MultiAssetSpawnerCfg(
+            assets_cfg=[
+                sim_utils.SphereCfg(
+                    radius=0.06,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 1.0, 0.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.07,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 0.0, 0.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.08,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 0.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.09,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 1.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.10,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 1.0, 0.0)
+                    ),
+                ),
+            ],
+            random_choice=True,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.4),
             collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.1, 0.0)),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.35, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
-        ),
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.35, 0.0, 2.0)),
     )
+
 
 ##
 # MDP settings
@@ -200,9 +231,9 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "static_friction_range": (0.8, 0.8),
-            "dynamic_friction_range": (0.6, 0.6),
-            "restitution_range": (0.0, 0.0),
+            "static_friction_range": (0.7, 1.0),
+            "dynamic_friction_range": (0.4, 0.7),
+            "restitution_range": (0.0, 0.4),
             "num_buckets": 64,
         },
     )
@@ -222,9 +253,9 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("ball", body_names=".*"),
-            "static_friction_range": (0.4, 0.6),
-            "dynamic_friction_range": (0.3, 0.5),
-            "restitution_range": (0.0, 0.0),
+            "static_friction_range": (0.8, 1.0),
+            "dynamic_friction_range": (0.6, 0.8),
+            "restitution_range": (0.4, 0.8),
             "num_buckets": 64,
         },
     )
@@ -234,7 +265,7 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("ball"),
-            "mass_distribution_params": (-0.1, 0.1),
+            "mass_distribution_params": (-0.2, 0.2),
             "operation": "add",
         },
     )
@@ -366,7 +397,6 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
-    # TODO: add ball-related curriculum terms
 
 
 ##
@@ -379,7 +409,9 @@ class CatchBallAndLocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings
-    scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5)
+    scene: MySceneCfg = MySceneCfg(
+        num_envs=4096, env_spacing=2.5, replicate_physics=False
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()
