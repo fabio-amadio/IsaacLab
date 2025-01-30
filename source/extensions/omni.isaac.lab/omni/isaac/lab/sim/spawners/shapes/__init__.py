@@ -16,6 +16,3 @@ on the configuration, the spawned prim can be:
 
 from .shapes import spawn_capsule, spawn_cone, spawn_cuboid, spawn_cylinder, spawn_sphere
 from .shapes_cfg import CapsuleCfg, ConeCfg, CuboidCfg, CylinderCfg, ShapeCfg, SphereCfg
-
-from .custom_shapes import spawn_random_sphere
-from .custom_shapes_cfg import RandomSphereCfg
