@@ -95,8 +95,9 @@ class MySceneCfg(InteractiveSceneCfg):
     # ball
     ball: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Ball",
-        spawn=sim_utils.SphereCfg(
-            radius=0.06,
+        spawn=sim_utils.RandomSphereCfg(
+            nominal_radius=0.08,
+            delta_radius=0.02,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.4),
             collision_props=sim_utils.CollisionPropertiesCfg(),
@@ -106,7 +107,6 @@ class MySceneCfg(InteractiveSceneCfg):
             pos=(0.35, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
         ),
     )
-
 
 ##
 # MDP settings
