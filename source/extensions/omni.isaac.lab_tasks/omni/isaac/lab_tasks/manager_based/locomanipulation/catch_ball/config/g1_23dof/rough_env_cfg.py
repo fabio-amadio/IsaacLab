@@ -95,7 +95,7 @@ class G1BaseWalkRewards(RewardsCfg):
         weight=-0.1,
         params={
             "command_name": "base_velocity",
-            "target_height": 0.18,
+            "target_height": 0.15,
             "sensor_cfg": SceneEntityCfg(
                 "contact_forces", body_names=".*_ankle_roll_link", preserve_order=True
             ),
@@ -167,12 +167,12 @@ class G1CatchBallRewards(G1BaseWalkRewards):
 
     # Reward for keeping the hands close to the ball
     ball_close_to_hands = RewTerm(
-        func=mdp.ball_close_to_hands_exp, weight=1.0, params={"std": 0.6}
+        func=mdp.ball_close_to_hands_exp, weight=0.1, params={"std": 0.25}
     )
 
     # Reward for keeping the hands orientation consistent
     same_hands_orientation = RewTerm(
-        func=mdp.same_hands_orientation_exp, weight=1.0, params={"std": 0.4}
+        func=mdp.same_hands_orientation_exp, weight=0.1, params={"std": 0.4}
     )
 
 
@@ -219,6 +219,7 @@ class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
         self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
         )
+        self.rewards.joint_deviation_arms.weight = -0.05
 
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
