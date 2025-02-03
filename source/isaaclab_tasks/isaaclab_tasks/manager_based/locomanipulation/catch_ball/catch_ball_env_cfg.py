@@ -6,36 +6,34 @@
 import math
 from dataclasses import MISSING
 
-import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
-from omni.isaac.lab.sim.schemas.schemas_cfg import RigidBodyPropertiesCfg
-from omni.isaac.lab.assets import (
+import isaaclab.sim as sim_utils
+from isaaclab.assets import (
     ArticulationCfg,
     AssetBaseCfg,
     RigidObjectCfg,
     DeformableObjectCfg,
 )
-from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
-from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
-from omni.isaac.lab.managers import EventTermCfg as EventTerm
-from omni.isaac.lab.managers import ObservationGroupCfg as ObsGroup
-from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
-from omni.isaac.lab.managers import RewardTermCfg as RewTerm
-from omni.isaac.lab.managers import SceneEntityCfg
-from omni.isaac.lab.managers import TerminationTermCfg as DoneTerm
-from omni.isaac.lab.scene import InteractiveSceneCfg
-from omni.isaac.lab.sensors import ContactSensorCfg, RayCasterCfg, patterns
-from omni.isaac.lab.terrains import TerrainImporterCfg
-from omni.isaac.lab.utils import configclass
-from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
-from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as Unoise
+from isaaclab.envs import ManagerBasedRLEnvCfg
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
+from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import ObservationGroupCfg as ObsGroup
+from isaaclab.managers import ObservationTermCfg as ObsTerm
+from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.scene import InteractiveSceneCfg
+from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
+from isaaclab.terrains import TerrainImporterCfg
+from isaaclab.utils import configclass
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
+from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
-import omni.isaac.lab_tasks.manager_based.locomanipulation.catch_ball.mdp as mdp
+import isaaclab_tasks.manager_based.locomanipulation.catch_ball.mdp as mdp
 
 ##
 # Pre-defined configs
 ##
-from omni.isaac.lab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
+from isaaclab.terrains.config.rough import ROUGH_TERRAINS_CFG  # isort: skip
 
 
 ##
@@ -59,6 +57,7 @@ class MySceneCfg(InteractiveSceneCfg):
             restitution_combine_mode="multiply",
             static_friction=1.0,
             dynamic_friction=1.0,
+            restitution=1.0,
         ),
         visual_material=sim_utils.MdlFileCfg(
             mdl_path=f"{ISAACLAB_NUCLEUS_DIR}/Materials/TilesMarbleSpiderWhiteBrickBondHoned/TilesMarbleSpiderWhiteBrickBondHoned.mdl",
@@ -93,23 +92,53 @@ class MySceneCfg(InteractiveSceneCfg):
         ),
     )
     # ball
-    ball: DeformableObjectCfg = DeformableObjectCfg(
+    ball: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Ball",
-        spawn=sim_utils.MeshSphereCfg(
-            radius=0.08,
-            deformable_props=sim_utils.DeformableBodyPropertiesCfg(
-                rest_offset=0.0, contact_offset=0.001
-            ),
+        spawn=sim_utils.MultiAssetSpawnerCfg(
+            assets_cfg=[
+                sim_utils.SphereCfg(
+                    radius=0.060,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 1.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.061,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 1.0, 0.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.062,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 0.0, 0.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.063,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 0.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.064,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(0.0, 1.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.065,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 1.0, 0.0)
+                    ),
+                ),
+            ],
+            random_choice=True,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.4),
-            physics_material=sim_utils.DeformableBodyMaterialCfg(
-                poissons_ratio=0.45, youngs_modulus=5e6
-            ),
-            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.1, 0.0)),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.3, 0.0, 2.0), rot=(1.0, 0.0, 0.0, 0.0)
-        ),
-        debug_vis=True,
+        init_state=RigidObjectCfg.InitialStateCfg(pos=(0.35, 0.0, 2.0)),
     )
 
 
@@ -182,12 +211,10 @@ class ObservationsCfg:
             clip=(-1.0, 1.0),
         )
         ball_pos = ObsTerm(
-            func=mdp.soft_ball_pos_in_robot_frame,
-            noise=Unoise(n_min=-0.01, n_max=0.01),
+            func=mdp.ball_pos_in_robot_frame, noise=Unoise(n_min=-0.01, n_max=0.01)
         )
         ball_vel = ObsTerm(
-            func=mdp.soft_ball_vel_in_robot_frame,
-            noise=Unoise(n_min=-0.01, n_max=0.01),
+            func=mdp.ball_vel_in_robot_frame, noise=Unoise(n_min=-0.01, n_max=0.01)
         )
 
         def __post_init__(self):
@@ -202,16 +229,15 @@ class ObservationsCfg:
 class EventCfg:
     """Configuration for events."""
 
-    # TODO: randomize also ball material
     # startup
-    physics_material = EventTerm(
+    robot_physics_material = EventTerm(
         func=mdp.randomize_rigid_body_material,
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "static_friction_range": (0.8, 0.8),
-            "dynamic_friction_range": (0.6, 0.6),
-            "restitution_range": (0.0, 0.0),
+            "static_friction_range": (0.7, 1.0),
+            "dynamic_friction_range": (0.4, 0.7),
+            "restitution_range": (0.0, 0.4),
             "num_buckets": 64,
         },
     )
@@ -222,6 +248,28 @@ class EventCfg:
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names="base"),
             "mass_distribution_params": (-5.0, 5.0),
+            "operation": "add",
+        },
+    )
+
+    ball_physics_material = EventTerm(
+        func=mdp.randomize_rigid_body_material,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("ball", body_names=".*"),
+            "static_friction_range": (0.8, 1.0),
+            "dynamic_friction_range": (0.6, 0.8),
+            "restitution_range": (0.4, 0.8),
+            "num_buckets": 64,
+        },
+    )
+
+    ball_physics_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("ball"),
+            "mass_distribution_params": (-0.2, 0.2),
             "operation": "add",
         },
     )
@@ -254,11 +302,20 @@ class EventCfg:
         },
     )
 
-    reset_ball = EventTerm(
-        func=mdp.reset_nodal_state_uniform,
+    reset_robot_joints = EventTerm(
+        func=mdp.reset_joints_by_scale,
         mode="reset",
         params={
-            "position_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "z": (-0.1, 0.1)},
+            "position_range": (0.5, 1.5),
+            "velocity_range": (0.0, 0.0),
+        },
+    )
+
+    reset_ball = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "yaw": (0, 0)},
             "velocity_range": {
                 "x": (0, 0),
                 "y": (0, 0),
@@ -268,15 +325,6 @@ class EventCfg:
                 "yaw": (0, 0),
             },
             "asset_cfg": SceneEntityCfg("ball"),
-        },
-    )
-
-    reset_robot_joints = EventTerm(
-        func=mdp.reset_joints_by_scale,
-        mode="reset",
-        params={
-            "position_range": (0.5, 1.5),
-            "velocity_range": (0.0, 0.0),
         },
     )
 
@@ -343,7 +391,7 @@ class TerminationsCfg:
         params={"minimum_height": 0.5, "asset_cfg": SceneEntityCfg("robot")},
     )
     ball_dropped = DoneTerm(
-        func=mdp.soft_root_height_below_minimum,
+        func=mdp.root_height_below_minimum,
         params={"minimum_height": 0.3, "asset_cfg": SceneEntityCfg("ball")},
     )
 
@@ -353,7 +401,6 @@ class CurriculumCfg:
     """Curriculum terms for the MDP."""
 
     terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
-    # TODO: add ball-related curriculum terms
 
 
 ##
@@ -366,7 +413,9 @@ class CatchBallAndLocomotionVelocityRoughEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the locomotion velocity-tracking environment."""
 
     # Scene settings
-    scene: MySceneCfg = MySceneCfg(num_envs=4096, env_spacing=2.5)
+    scene: MySceneCfg = MySceneCfg(
+        num_envs=4096, env_spacing=2.5, replicate_physics=False
+    )
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()

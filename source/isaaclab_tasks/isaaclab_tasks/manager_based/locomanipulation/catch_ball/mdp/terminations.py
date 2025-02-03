@@ -14,11 +14,11 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from omni.isaac.lab.assets import RigidObject, DeformableObject
-from omni.isaac.lab.managers import SceneEntityCfg
+from isaaclab.assets import RigidObject, DeformableObject
+from isaaclab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
-    from omni.isaac.lab.envs import ManagerBasedRLEnv
+    from isaaclab.envs import ManagerBasedRLEnv
 
 
 def terrain_out_of_bounds(

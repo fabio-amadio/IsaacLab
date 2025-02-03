@@ -21,11 +21,11 @@ Reference: https://github.com/unitreerobotics/unitree_ros
 
 from pathlib import Path
 
-import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.actuators import ActuatorNetMLPCfg, DCMotorCfg, ImplicitActuatorCfg
-from omni.isaac.lab.assets.articulation import ArticulationCfg
-from omni.isaac.lab.utils.assets import ISAACLAB_NUCLEUS_DIR
-
+import isaaclab.sim as sim_utils
+from isaaclab.actuators import ActuatorNetMLPCfg, DCMotorCfg, ImplicitActuatorCfg
+from isaaclab.assets.articulation import ArticulationCfg
+from isaaclab.utils.assets import ISAACLAB_NUCLEUS_DIR
+from isaaclab_assets import ISAACLAB_ASSETS_DATA_DIR
 ##
 # Configuration - Actuators.
 ##
@@ -389,10 +389,9 @@ G1_MINIMAL_CFG.spawn.usd_path = f"{ISAACLAB_NUCLEUS_DIR}/Robots/Unitree/G1/g1_mi
 
 This configuration removes most collision meshes to speed up simulation.
 """
-
 G1_23DOF_RUBBER_HANDS_MINIMAL_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{Path(__file__).parent.resolve()}/../../../data/Robots/Unitree/G1/g1_23dof_rubber_hands_minimal.usd",
+        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/Unitree/G1/g1_23dof_rubber_hands_minimal.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,

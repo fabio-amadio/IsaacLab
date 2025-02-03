@@ -13,7 +13,7 @@ from . import agents
 
 gym.register(
     id="Isaac-Velocity-Rough-G1-Only-Walk-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1OnlyWalkRoughEnvCfg",
@@ -23,7 +23,7 @@ gym.register(
 
 gym.register(
     id="Isaac-Velocity-Rough-G1-Standing-Catch-Ball-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1StandingCatchBallRoughEnvCfg",
@@ -33,7 +33,7 @@ gym.register(
 
 gym.register(
     id="Isaac-Velocity-Rough-G1-Catch-Ball-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1CatchBallRoughEnvCfg",
@@ -43,7 +43,7 @@ gym.register(
 
 gym.register(
     id="Isaac-Velocity-Flat-G1-Only-Walk-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1OnlyWalkFlatEnvCfg",
@@ -53,7 +53,7 @@ gym.register(
 
 gym.register(
     id="Isaac-Velocity-Flat-G1-Standing-Catch-Ball-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1StandingCatchBallFlatEnvCfg",
@@ -63,54 +63,10 @@ gym.register(
 
 gym.register(
     id="Isaac-Velocity-Flat-G1-Catch-Ball-v0",
-    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1CatchBallFlatEnvCfg",
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1CatchBallFlatPPORunnerCfg",
     },
 )
-
-# ##
-# # Register Catch-Soft-Ball Gym environments.
-# ##
-
-# gym.register(
-#     id="Isaac-Velocity-Rough-G1-Standing-Catch-Soft-Ball-v0",
-#     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
-#     disable_env_checker=True,
-#     kwargs={
-#         "env_cfg_entry_point": f"{__name__}.soft_ball_rough_env_cfg:G1StandingCatchBallRoughEnvCfg",
-#         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1StandingCatchSoftBallRoughPPORunnerCfg",
-#     },
-# )
-
-# gym.register(
-#     id="Isaac-Velocity-Rough-G1-Catch-Soft-Ball-v0",
-#     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
-#     disable_env_checker=True,
-#     kwargs={
-#         "env_cfg_entry_point": f"{__name__}.soft_ball_rough_env_cfg:G1CatchBallRoughEnvCfg",
-#         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1CatchSoftBallRoughPPORunnerCfg",
-#     },
-# )
-
-# gym.register(
-#     id="Isaac-Velocity-Flat-G1-Standing-Catch-Soft-Ball-v0",
-#     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
-#     disable_env_checker=True,
-#     kwargs={
-#         "env_cfg_entry_point": f"{__name__}.soft_ball_flat_env_cfg:G1StandingCatchBallFlatEnvCfg",
-#         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1StandingCatchSoftBallFlatPPORunnerCfg",
-#     },
-# )
-
-# gym.register(
-#     id="Isaac-Velocity-Flat-G1-Catch-Soft-Ball-v0",
-#     entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
-#     disable_env_checker=True,
-#     kwargs={
-#         "env_cfg_entry_point": f"{__name__}.soft_ball_flat_env_cfg:G1CatchBallFlatEnvCfg",
-#         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1CatchSoftBallFlatPPORunnerCfg",
-#     },
-# )

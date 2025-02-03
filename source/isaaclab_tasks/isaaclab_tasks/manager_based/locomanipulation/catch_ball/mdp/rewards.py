@@ -14,10 +14,9 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from omni.isaac.lab.assets import RigidObject, DeformableObject
-from omni.isaac.lab.managers import SceneEntityCfg
-from omni.isaac.lab.sensors import ContactSensor
-from omni.isaac.lab.utils.math import (
+from isaaclab.managers import SceneEntityCfg
+from isaaclab.sensors import ContactSensor
+from isaaclab.utils.math import (
     quat_rotate_inverse,
     yaw_quat,
     matrix_from_quat,
@@ -25,9 +24,8 @@ from omni.isaac.lab.utils.math import (
 )
 
 if TYPE_CHECKING:
-    from omni.isaac.lab.envs import ManagerBasedRLEnv
-
-
+    from isaaclab.envs import ManagerBasedRLEnv
+    
 def feet_air_time(
     env: ManagerBasedRLEnv,
     command_name: str,

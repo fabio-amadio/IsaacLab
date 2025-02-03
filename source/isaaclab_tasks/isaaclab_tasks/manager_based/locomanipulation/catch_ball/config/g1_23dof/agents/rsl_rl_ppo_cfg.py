@@ -3,13 +3,13 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from omni.isaac.lab.utils import configclass
-
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
+from isaaclab_rl.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
     RslRlPpoActorCriticCfg,
     RslRlPpoAlgorithmCfg,
 )
+
+from isaaclab.utils import configclass
 
 
 @configclass
@@ -77,31 +77,3 @@ class G1StandingCatchBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
         self.experiment_name = "g1_standing_catch_ball_flat"
-
-
-# @configclass
-# class G1CatchSoftBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
-#     def __post_init__(self):
-#         super().__post_init__()
-#         self.experiment_name = "g1_soft_catch_ball_rough"
-
-
-# @configclass
-# class G1StandingCatchSoftBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
-#     def __post_init__(self):
-#         super().__post_init__()
-#         self.experiment_name = "g1_standing_soft_catch_ball_rough"
-
-
-# @configclass
-# class G1CatchSoftBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
-#     def __post_init__(self):
-#         super().__post_init__()
-#         self.experiment_name = "g1_soft_catch_ball_flat"
-
-
-# @configclass
-# class G1StandingCatchSoftBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
-#     def __post_init__(self):
-#         super().__post_init__()
-#         self.experiment_name = "g1_standing_soft_catch_ball_flat"
