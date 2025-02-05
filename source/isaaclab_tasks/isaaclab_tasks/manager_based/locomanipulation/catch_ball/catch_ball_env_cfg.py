@@ -97,39 +97,21 @@ class MySceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.MultiAssetSpawnerCfg(
             assets_cfg=[
                 sim_utils.SphereCfg(
-                    radius=0.060,
-                    visual_material=sim_utils.PreviewSurfaceCfg(
-                        diffuse_color=(1.0, 1.0, 1.0)
-                    ),
-                ),
-                sim_utils.SphereCfg(
-                    radius=0.061,
-                    visual_material=sim_utils.PreviewSurfaceCfg(
-                        diffuse_color=(0.0, 1.0, 0.0)
-                    ),
-                ),
-                sim_utils.SphereCfg(
-                    radius=0.062,
-                    visual_material=sim_utils.PreviewSurfaceCfg(
-                        diffuse_color=(1.0, 0.0, 0.0)
-                    ),
-                ),
-                sim_utils.SphereCfg(
-                    radius=0.063,
+                    radius=0.059,
                     visual_material=sim_utils.PreviewSurfaceCfg(
                         diffuse_color=(0.0, 0.0, 1.0)
                     ),
                 ),
                 sim_utils.SphereCfg(
-                    radius=0.064,
+                    radius=0.060,
                     visual_material=sim_utils.PreviewSurfaceCfg(
-                        diffuse_color=(0.0, 1.0, 1.0)
+                        diffuse_color=(0.0, 1.0, 0.0)
                     ),
                 ),
                 sim_utils.SphereCfg(
-                    radius=0.065,
+                    radius=0.061,
                     visual_material=sim_utils.PreviewSurfaceCfg(
-                        diffuse_color=(1.0, 1.0, 0.0)
+                        diffuse_color=(1.0, 0.0, 0.0)
                     ),
                 ),
             ],

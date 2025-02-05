@@ -72,12 +72,12 @@ def feet_air_time_positive_biped(
     in_contact = contact_time > 0.0
     in_mode_time = torch.where(in_contact, contact_time, air_time)
     single_stance = torch.sum(in_contact.int(), dim=1) == 1
-    # reward = torch.min(
-    #     torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
-    # )[0]
-    reward = torch.mean(
+    reward = torch.min(
         torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
-    )
+    )[0]
+    # reward = torch.mean(
+    #     torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
+    # )
     reward = torch.clamp(reward, max=threshold)
     # no reward for zero command
     reward *= (

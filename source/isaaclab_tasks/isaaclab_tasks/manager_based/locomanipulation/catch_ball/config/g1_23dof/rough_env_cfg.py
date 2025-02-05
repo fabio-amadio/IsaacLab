@@ -167,12 +167,12 @@ class G1CatchBallRewards(G1BaseWalkRewards):
 
     # Reward for keeping the hands close to the ball
     ball_close_to_hands = RewTerm(
-        func=mdp.ball_close_to_hands_exp, weight=0.1, params={"std": 0.25}
+        func=mdp.ball_close_to_hands_exp, weight=1.0, params={"std": 0.6}
     )
 
     # Reward for keeping the hands orientation consistent
     same_hands_orientation = RewTerm(
-        func=mdp.same_hands_orientation_exp, weight=0.1, params={"std": 0.4}
+        func=mdp.same_hands_orientation_exp, weight=1.0, params={"std": 0.4}
     )
 
 
