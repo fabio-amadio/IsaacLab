@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""This sub-module contains the functions that are specific to the locomanipulation environments."""
+"""This sub-module contains the functions that are specific to the catch-ball environments."""
 
 from isaaclab.envs.mdp import *  # noqa: F401, F403
 

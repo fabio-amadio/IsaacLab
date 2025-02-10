@@ -13,11 +13,11 @@ from isaaclab.utils import configclass
 
 
 @configclass
-class G1CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+class G1Dof23CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
     max_iterations = 3000
     save_interval = 50
-    experiment_name = "g1_catch_ball_rough"
+    experiment_name = "g1_23_dof_catch_ball_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
@@ -42,38 +42,38 @@ class G1CatchBallRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 
 
 @configclass
-class G1OnlyWalkRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+class G1Dof23CatchBallRoughOnlyWalkPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.experiment_name = "g1_only_walk_rough"
+        self.experiment_name = "g1_23_dof_cb_only_walk_rough"
 
 
 @configclass
-class G1StandingCatchBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+class G1Dof23CatchBallRoughStandingPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.experiment_name = "g1_standing_catch_ball_rough"
+        self.experiment_name = "g1_23_dof_standing_catch_ball_rough"
 
 
 @configclass
-class G1CatchBallFlatPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
+class G1Dof23CatchBallFlatPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
         self.max_iterations = 3000
-        self.experiment_name = "g1_catch_ball_flat"
+        self.experiment_name = "g1_23_dof_catch_ball_flat"
         self.policy.actor_hidden_dims = [256, 128, 128]
         self.policy.critic_hidden_dims = [256, 128, 128]
 
 
 @configclass
-class G1OnlyWalkFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+class G1Dof23CatchBallFlatOnlyWalkPPORunnerCfg(G1Dof23CatchBallFlatPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.experiment_name = "g1_only_walk_flat"
+        self.experiment_name = "g1_23_dof_cb_only_walk_flat"
 
 
 @configclass
-class G1StandingCatchBallFlatPPORunnerCfg(G1CatchBallFlatPPORunnerCfg):
+class G1Dof23CatchBallFlatStandingPPORunnerCfg(G1Dof23CatchBallFlatPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.experiment_name = "g1_standing_catch_ball_flat"
+        self.experiment_name = "g1_23_dof_standing_catch_ball_flat"

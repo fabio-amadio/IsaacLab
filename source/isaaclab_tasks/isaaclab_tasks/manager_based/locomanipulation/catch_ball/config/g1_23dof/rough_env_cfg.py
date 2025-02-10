@@ -24,8 +24,9 @@ from isaaclab_assets import G1_23DOF_RUBBER_HANDS_MINIMAL_CFG  # isort: skip
 
 
 @configclass
-class G1BaseWalkRewards(RewardsCfg):
+class G1Dof23BaseWalkRewards(RewardsCfg):
     """Reward terms for the MDP."""
+
     # High termination penalty
     termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
 
@@ -61,7 +62,7 @@ class G1BaseWalkRewards(RewardsCfg):
         func=mdp.base_height_l2,
         weight=-0.25,
         params={
-            "target_height": 0.73,
+            "target_height": 0.68,
         },
     )
 
@@ -162,7 +163,7 @@ class G1BaseWalkRewards(RewardsCfg):
 
 
 @configclass
-class G1CatchBallRewards(G1BaseWalkRewards):
+class G1Dof23CatchBallRewards(G1Dof23BaseWalkRewards):
     """Reward terms for the MDP."""
 
     # Reward for keeping the hands close to the ball
@@ -177,8 +178,8 @@ class G1CatchBallRewards(G1BaseWalkRewards):
 
 
 @configclass
-class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
-    rewards: G1CatchBallRewards = G1CatchBallRewards()
+class G1Dof23CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
+    rewards: G1Dof23CatchBallRewards = G1Dof23CatchBallRewards()
 
     def __post_init__(self):
         # post init of parent
@@ -209,7 +210,9 @@ class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
 
         # Rewards
         self.rewards.undesired_contacts.weight = -0.25
-        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg("contact_forces", body_names=".*_ankle_roll_link")
+        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg(
+            "contact_forces", body_names=".*_ankle_roll_link"
+        )
         self.rewards.undesired_contacts.params["threshold"] = 400.0
         self.rewards.flat_orientation_l2.weight = -1.0
         self.rewards.action_rate_l2.weight = -0.005
@@ -230,15 +233,17 @@ class G1CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
 
 
 @configclass
-class G1OnlyWalkRoughEnvCfg(G1CatchBallRoughEnvCfg):
+class G1Dof23CatchBallRoughOnlyWalkEnvCfg(G1Dof23CatchBallRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
 
         # set the only walk rewards
-        self.rewards: G1BaseWalkRewards = G1BaseWalkRewards()
+        self.rewards: G1Dof23BaseWalkRewards = G1Dof23BaseWalkRewards()
         self.rewards.undesired_contacts.weight = -0.25
-        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg("contact_forces", body_names=".*_ankle_roll_link")
+        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg(
+            "contact_forces", body_names=".*_ankle_roll_link"
+        )
         self.rewards.undesired_contacts.params["threshold"] = 400.0
         self.rewards.flat_orientation_l2.weight = -1.0
         self.rewards.action_rate_l2.weight = -0.005
@@ -253,12 +258,12 @@ class G1OnlyWalkRoughEnvCfg(G1CatchBallRoughEnvCfg):
 
         # remove ball from the scene
         self.scene.ball = None
-        
+
         # remove ball-related settings
         self.observations.policy.ball_pos = ObsTerm(
             func=mdp.dummy_zero_obs,
             params={"dim": 3},
-            noise=Unoise(n_min=-0.01, n_max=0.01),
+            noise=Unoise(n_min=-10, n_max=10),
         )
         self.observations.policy.ball_vel = ObsTerm(
             func=mdp.dummy_zero_obs,
@@ -272,7 +277,7 @@ class G1OnlyWalkRoughEnvCfg(G1CatchBallRoughEnvCfg):
 
 
 @configclass
-class G1StandingCatchBallRoughEnvCfg(G1CatchBallRoughEnvCfg):
+class G1Dof23CatchBallRoughStandingEnvCfg(G1Dof23CatchBallRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()

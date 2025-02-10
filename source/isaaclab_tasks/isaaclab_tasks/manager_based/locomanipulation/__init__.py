@@ -6,3 +6,4 @@
 """Locomanipulation environments for legged robots."""
 
 from .catch_ball import *  # noqa
+from .push_block import *  # noqa

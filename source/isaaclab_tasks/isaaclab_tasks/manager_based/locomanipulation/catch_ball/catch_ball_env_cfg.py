@@ -114,6 +114,18 @@ class MySceneCfg(InteractiveSceneCfg):
                         diffuse_color=(1.0, 0.0, 0.0)
                     ),
                 ),
+                sim_utils.SphereCfg(
+                    radius=0.062,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 0.0, 1.0)
+                    ),
+                ),
+                sim_utils.SphereCfg(
+                    radius=0.063,
+                    visual_material=sim_utils.PreviewSurfaceCfg(
+                        diffuse_color=(1.0, 1.0, 0.0)
+                    ),
+                ),
             ],
             random_choice=True,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
@@ -121,6 +133,7 @@ class MySceneCfg(InteractiveSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(pos=(0.35, 0.0, 2.0)),
+        # init_state=RigidObjectCfg.InitialStateCfg(pos=(2.5, 0.0, 1.1)),
     )
 
 
@@ -297,7 +310,7 @@ class EventCfg:
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
-            "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "yaw": (0, 0)},
+            "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "z": (-0.1, 0.1), "yaw": (0, 0)},
             "velocity_range": {
                 "x": (0, 0),
                 "y": (0, 0),
@@ -309,6 +322,23 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("ball"),
         },
     )
+
+    # reset_ball = EventTerm(
+    #     func=mdp.reset_root_state_uniform,
+    #     mode="reset",
+    #     params={
+    #         "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "z": (-0.1, 0.1), "yaw": (0, 0)},
+    #         "velocity_range": {
+    #             "x": (-2.5, -5.0),
+    #             "y": (-0.1, 0.1),
+    #             "z": (2.0, 4.0),
+    #             "roll": (0, 0),
+    #             "pitch": (0, 0),
+    #             "yaw": (0, 0),
+    #         },
+    #         "asset_cfg": SceneEntityCfg("ball"),
+    #     },
+    # )
 
     # interval
     push_robot = EventTerm(

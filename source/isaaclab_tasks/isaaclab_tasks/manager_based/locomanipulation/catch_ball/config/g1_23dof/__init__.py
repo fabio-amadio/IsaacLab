@@ -12,61 +12,61 @@ from . import agents
 ##
 
 gym.register(
-    id="Isaac-Velocity-Rough-G1-Only-Walk-v0",
+    id="Isaac-Catch-Ball-Rough-G1-Dof-23-Only-Walk-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1OnlyWalkRoughEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1OnlyWalkRoughPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1Dof23CatchBallRoughOnlyWalkEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallRoughOnlyWalkPPORunnerCfg",
     },
 )
 
 gym.register(
-    id="Isaac-Velocity-Rough-G1-Standing-Catch-Ball-v0",
+    id="Isaac-Catch-Ball-Rough-G1-Dof-23-Standing-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1StandingCatchBallRoughEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1StandingCatchBallRoughPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1Dof23CatchBallRoughStandingEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallRoughStandingPPORunnerCfg",
     },
 )
 
 gym.register(
-    id="Isaac-Velocity-Rough-G1-Catch-Ball-v0",
+    id="Isaac-Catch-Ball-Rough-G1-Dof-23-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1CatchBallRoughEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1CatchBallRoughPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.rough_env_cfg:G1Dof23CatchBallRoughEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallRoughPPORunnerCfg",
     },
 )
 
 gym.register(
-    id="Isaac-Velocity-Flat-G1-Only-Walk-v0",
+    id="Isaac-Catch-Ball-Flat-G1-Dof-23-Only-Walk-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1OnlyWalkFlatEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1OnlyWalkFlatPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1Dof23CatchBallFlatOnlyWalkEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallFlatOnlyWalkPPORunnerCfg",
     },
 )
 
 gym.register(
-    id="Isaac-Velocity-Flat-G1-Standing-Catch-Ball-v0",
+    id="Isaac-Catch-Ball-Flat-G1-Dof-23-Standing-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1StandingCatchBallFlatEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1StandingCatchBallFlatPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1Dof23CatchBallFlatStandingEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallFlatStandingPPORunnerCfg",
     },
 )
 
 gym.register(
-    id="Isaac-Velocity-Flat-G1-Catch-Ball-v0",
+    id="Isaac-Catch-Ball-Flat-G1-Dof-23-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1CatchBallFlatEnvCfg",
-        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1CatchBallFlatPPORunnerCfg",
+        "env_cfg_entry_point": f"{__name__}.flat_env_cfg:G1Dof23CatchBallFlatEnvCfg",
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:G1Dof23CatchBallFlatPPORunnerCfg",
     },
 )

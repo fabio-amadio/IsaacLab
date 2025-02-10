@@ -7,14 +7,14 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
 from .rough_env_cfg import (
-    G1CatchBallRoughEnvCfg,
-    G1OnlyWalkRoughEnvCfg,
-    G1StandingCatchBallRoughEnvCfg,
+    G1Dof23CatchBallRoughEnvCfg,
+    G1Dof23CatchBallRoughOnlyWalkEnvCfg,
+    G1Dof23CatchBallRoughStandingEnvCfg,
 )
 
 
 @configclass
-class G1CatchBallFlatEnvCfg(G1CatchBallRoughEnvCfg):
+class G1Dof23CatchBallFlatEnvCfg(G1Dof23CatchBallRoughEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -48,7 +48,7 @@ class G1CatchBallFlatEnvCfg(G1CatchBallRoughEnvCfg):
 
 
 @configclass
-class G1OnlyWalkFlatEnvCfg(G1OnlyWalkRoughEnvCfg):
+class G1Dof23CatchBallFlatOnlyWalkEnvCfg(G1Dof23CatchBallRoughOnlyWalkEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
@@ -82,7 +82,7 @@ class G1OnlyWalkFlatEnvCfg(G1OnlyWalkRoughEnvCfg):
 
 
 @configclass
-class G1StandingCatchBallFlatEnvCfg(G1StandingCatchBallRoughEnvCfg):
+class G1Dof23StandingCatchBallFlatEnvCfg(G1Dof23CatchBallRoughStandingEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
