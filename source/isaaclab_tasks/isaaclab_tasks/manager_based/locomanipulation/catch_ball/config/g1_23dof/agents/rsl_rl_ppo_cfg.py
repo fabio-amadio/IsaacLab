@@ -59,7 +59,7 @@ class G1StandingCatchBallRoughPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
 class G1CatchBallFlatPPORunnerCfg(G1CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.max_iterations = 2000
+        self.max_iterations = 3000
         self.experiment_name = "g1_catch_ball_flat"
         self.policy.actor_hidden_dims = [256, 128, 128]
         self.policy.critic_hidden_dims = [256, 128, 128]

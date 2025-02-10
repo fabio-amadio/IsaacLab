@@ -25,7 +25,8 @@ from isaaclab.utils.math import (
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedRLEnv
-    
+
+
 def feet_air_time(
     env: ManagerBasedRLEnv,
     command_name: str,
