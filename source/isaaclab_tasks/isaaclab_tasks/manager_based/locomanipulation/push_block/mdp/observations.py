@@ -16,52 +16,34 @@ if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedRLEnv
 
 
-def block_pos_in_robot_frame(
+def block_pos_w(
     env: ManagerBasedRLEnv,
     block_cfg: SceneEntityCfg = SceneEntityCfg("block"),
-    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """The position of the block in the robot frame."""
+    """The position of the block in world frame."""
     block: RigidObject = env.scene[block_cfg.name]
-    robot: RigidObject = env.scene[robot_cfg.name]
-
     block_pos_w = block.data.root_link_pos_w
-    robot_pos_w = robot.data.root_link_pos_w
-    block_to_robot_pos = block_pos_w - robot_pos_w
-
-    return block_to_robot_pos
+    return block_pos_w
 
 
-def ball_rot_in_robot_frame(
+def block_quat_w(
     env: ManagerBasedRLEnv,
     block_cfg: SceneEntityCfg = SceneEntityCfg("block"),
-    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """The rotation of the block in the robot frame."""
+    """The rotation of the block in world frame."""
     block: RigidObject = env.scene[block_cfg.name]
-    robot: RigidObject = env.scene[robot_cfg.name]
-
     block_quat_w = block.data.root_link_quat_w
-    robot_quat_w = robot.data.root_link_quat_w
-    block_to_robot_quat = quat_mul(quat_inv(robot_quat_w), block_quat_w)
-
-    return block_to_robot_quat
+    return block_quat_w
 
 
-def ball_vel_in_robot_frame(
+def block_vel_w(
     env: ManagerBasedRLEnv,
     block_cfg: SceneEntityCfg = SceneEntityCfg("block"),
-    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """The velocity of the block in the robot frame."""
+    """The velocity of the block in world frame."""
     block: RigidObject = env.scene[block_cfg.name]
-    robot: RigidObject = env.scene[robot_cfg.name]
-
-    block_vel_w = block.data.root_link_pos_w
-    robot_vel_w = robot.data.root_link_pos_w
-    block_to_robot_vel = block_vel_w - robot_vel_w
-
-    return block_to_robot_vel
+    block_vel_w = block.data.root_link_vel_w
+    return block_vel_w
 
 
 def dummy_zero_obs(

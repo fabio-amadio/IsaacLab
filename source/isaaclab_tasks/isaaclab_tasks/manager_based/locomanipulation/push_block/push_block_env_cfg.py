@@ -11,7 +11,6 @@ from isaaclab.assets import (
     ArticulationCfg,
     AssetBaseCfg,
     RigidObjectCfg,
-    DeformableObjectCfg,
 )
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
@@ -22,7 +21,7 @@ from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
-from isaaclab.sensors import ContactSensorCfg, RayCasterCfg, patterns
+from isaaclab.sensors import ContactSensorCfg
 from isaaclab.terrains import TerrainImporterCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
@@ -82,6 +81,20 @@ class MySceneCfg(InteractiveSceneCfg):
             texture_file=f"{ISAAC_NUCLEUS_DIR}/Materials/Textures/Skies/PolyHaven/kloofendal_43d_clear_puresky_4k.hdr",
         ),
     )
+    # block
+    block: RigidObjectCfg = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/Block",
+        spawn=sim_utils.CuboidCfg(
+            size=(1.2, 1.2, 1.2),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+            mass_props=sim_utils.MassPropertiesCfg(mass=20.0),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.1, 0.0)),
+        ),
+        init_state=RigidObjectCfg.InitialStateCfg(
+            pos=(1.1, 0.0, 0.6), rot=(1.0, 0.0, 0.0, 0.0)
+        ),
+    )
 
 
 ##
@@ -94,7 +107,7 @@ class CommandsCfg:
     """Command specifications for the MDP."""
 
     base_velocity = mdp.UniformVelocityCommandCfg(
-        asset_name="robot",
+        asset_name="block",
         resampling_time_range=(10.0, 10.0),
         rel_standing_envs=0.02,
         rel_heading_envs=1.0,
@@ -146,6 +159,11 @@ class ObservationsCfg:
         )
         joint_vel = ObsTerm(func=mdp.joint_vel_rel, noise=Unoise(n_min=-1.5, n_max=1.5))
         actions = ObsTerm(func=mdp.last_action)
+        block_pos = ObsTerm(func=mdp.block_pos_w, noise=Unoise(n_min=-0.01, n_max=0.01))
+        block_quat = ObsTerm(
+            func=mdp.block_quat_w, noise=Unoise(n_min=-0.01, n_max=0.01)
+        )
+        block_vel = ObsTerm(func=mdp.block_vel_w, noise=Unoise(n_min=-0.01, n_max=0.01))
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -219,6 +237,45 @@ class EventCfg:
         },
     )
 
+    add_block_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("block"),
+            "mass_distribution_params": (-5.0, 5.0),
+            "operation": "add",
+        },
+    )
+
+    block_physics_material = EventTerm(
+        func=mdp.randomize_rigid_body_material,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("block", body_names=".*"),
+            "static_friction_range": (0.8, 1.0),
+            "dynamic_friction_range": (0.6, 0.8),
+            "restitution_range": (0.0, 0.0),
+            "num_buckets": 64,
+        },
+    )
+
+    reset_block = EventTerm(
+        func=mdp.reset_root_state_uniform,
+        mode="reset",
+        params={
+            "pose_range": {"x": (-0.1, 0.1), "y": (-0.1, 0.1), "yaw": (-0.1, 0.1)},
+            "velocity_range": {
+                "x": (0, 0),
+                "y": (0, 0),
+                "z": (0, 0),
+                "roll": (0, 0),
+                "pitch": (0, 0),
+                "yaw": (0, 0),
+            },
+            "asset_cfg": SceneEntityCfg("block"),
+        },
+    )
+
     # interval
     push_robot = EventTerm(
         func=mdp.push_by_setting_velocity,
@@ -232,16 +289,24 @@ class EventCfg:
 class RewardsCfg:
     """Reward terms for the MDP."""
 
-    # -- task
+    # -- task (track block vel)
     track_lin_vel_xy_exp = RewTerm(
         func=mdp.track_lin_vel_xy_exp,
         weight=1.0,
-        params={"command_name": "base_velocity", "std": math.sqrt(0.25)},
+        params={
+            "asset_cfg": SceneEntityCfg("block"),
+            "command_name": "base_velocity",
+            "std": math.sqrt(0.25),
+        },
     )
     track_ang_vel_z_exp = RewTerm(
         func=mdp.track_ang_vel_z_exp,
         weight=0.5,
-        params={"command_name": "base_velocity", "std": math.sqrt(0.25)},
+        params={
+            "asset_cfg": SceneEntityCfg("block"),
+            "command_name": "base_velocity",
+            "std": math.sqrt(0.25),
+        },
     )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time,
@@ -267,6 +332,12 @@ class RewardsCfg:
             "threshold": 1.0,
         },
     )
+    block_flat_orientation_l2 = RewTerm(
+        func=mdp.flat_orientation_l2,
+        weight=-1.0,
+        params={"asset_cfg": SceneEntityCfg("block")},
+    )
+
     # -- optional penalties
     flat_orientation_l2 = RewTerm(func=mdp.flat_orientation_l2, weight=0.0)
     dof_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=0.0)
@@ -280,6 +351,20 @@ class TerminationsCfg:
     falling = DoneTerm(
         func=mdp.root_height_below_minimum,
         params={"minimum_height": 0.5, "asset_cfg": SceneEntityCfg("robot")},
+    )
+    torso_contact = DoneTerm(
+        func=mdp.illegal_contact,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names="torso_link"),
+            "threshold": 1.0,
+        },
+    )
+    head_contact = DoneTerm(
+        func=mdp.illegal_contact,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names="head_link"),
+            "threshold": 1.0,
+        },
     )
 
 

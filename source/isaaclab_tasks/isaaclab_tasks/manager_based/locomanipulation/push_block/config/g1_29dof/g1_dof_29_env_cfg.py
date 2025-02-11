@@ -228,9 +228,10 @@ class G1Dof29PushBlockEnvCfg(PushBlockCfg):
         )
 
         # Commands
-        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 0.2)
+        self.commands.base_velocity.ranges.lin_vel_y = (-0.1, 0.1)
+        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+        self.commands.base_velocity.ranges.heading = (-0.1, 0.1)
 
 
 @configclass
@@ -258,4 +259,32 @@ class G1Dof29PushBlockOnlyWalkCfg(G1Dof29PushBlockEnvCfg):
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
         )
 
-        # remove block from the scene (TODO)
+        # remove block from the scene
+        self.scene.block = None
+
+        # track robot velocity
+        self.rewards.track_lin_vel_xy_exp.params["asset_cfg"] = SceneEntityCfg("robot")
+        self.rewards.track_ang_vel_z_exp.params["asset_cfg"] = SceneEntityCfg("robot")
+        self.commands.base_velocity.asset_name = "robot"
+
+        # remove ball-related settings
+        self.observations.policy.block_pos = ObsTerm(
+            func=mdp.dummy_zero_obs,
+            params={"dim": 3},
+            noise=Unoise(n_min=-10, n_max=10),
+        )
+        self.observations.policy.block_quat = ObsTerm(
+            func=mdp.dummy_zero_obs,
+            params={"dim": 3},
+            noise=Unoise(n_min=-10, n_max=10), 
+        )
+        self.observations.policy.block_vel = ObsTerm(
+            func=mdp.dummy_zero_obs,
+            params={"dim": 6},
+            noise=Unoise(n_min=-10, n_max=10),  # TODO: check this noise size
+        )
+        self.rewards.block_flat_orientation_l2 = None
+        self.events.block_physics_material = None
+        self.events.add_block_mass = None
+        self.events.reset_block = None
+
