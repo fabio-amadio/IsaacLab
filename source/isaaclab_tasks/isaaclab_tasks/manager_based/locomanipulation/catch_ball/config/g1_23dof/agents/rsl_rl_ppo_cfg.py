@@ -59,7 +59,7 @@ class G1Dof23CatchBallRoughStandingPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCf
 class G1Dof23CatchBallFlatPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
-        self.max_iterations = 3000
+        self.max_iterations = 6000
         self.experiment_name = "g1_23_dof_catch_ball_flat"
         self.policy.actor_hidden_dims = [256, 128, 128]
         self.policy.critic_hidden_dims = [256, 128, 128]
@@ -69,6 +69,7 @@ class G1Dof23CatchBallFlatPPORunnerCfg(G1Dof23CatchBallRoughPPORunnerCfg):
 class G1Dof23CatchBallFlatOnlyWalkPPORunnerCfg(G1Dof23CatchBallFlatPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
+        self.max_iterations = 4000
         self.experiment_name = "g1_23_dof_cb_only_walk_flat"
 
 
