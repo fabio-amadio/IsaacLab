@@ -73,8 +73,8 @@ def ball_vel_in_robot_frame(
     ball: RigidObject = env.scene[ball_cfg.name]
     robot: RigidObject = env.scene[robot_cfg.name]
 
-    ball_vel_w = ball.data.root_link_pos_w
-    robot_vel_w = robot.data.root_link_pos_w
+    ball_vel_w = ball.data.root_link_vel_w
+    robot_vel_w = robot.data.root_link_vel_w
     ball_to_robot_vel = ball_vel_w - robot_vel_w
 
     return ball_to_robot_vel
@@ -90,7 +90,7 @@ def soft_ball_vel_in_robot_frame(
     robot: RigidObject = env.scene[robot_cfg.name]
 
     ball_vel_w = ball.data.root_vel_w
-    robot_vel_w = robot.data.root_link_pos_w
+    robot_vel_w = robot.data.root_link_vel_w
     ball_to_robot_vel = ball_vel_w - robot_vel_w
 
     return ball_to_robot_vel

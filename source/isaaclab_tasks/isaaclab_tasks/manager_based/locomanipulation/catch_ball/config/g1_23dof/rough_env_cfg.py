@@ -267,7 +267,7 @@ class G1Dof23CatchBallRoughOnlyWalkEnvCfg(G1Dof23CatchBallRoughEnvCfg):
         )
         self.observations.policy.ball_vel = ObsTerm(
             func=mdp.dummy_zero_obs,
-            params={"dim": 3},
+            params={"dim": 6},
             noise=Unoise(n_min=-10, n_max=10),  # TODO: check this noise size
         )
         self.events.ball_physics_material = None
