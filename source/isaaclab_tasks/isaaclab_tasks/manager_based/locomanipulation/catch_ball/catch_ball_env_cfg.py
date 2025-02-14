@@ -11,7 +11,6 @@ from isaaclab.assets import (
     ArticulationCfg,
     AssetBaseCfg,
     RigidObjectCfg,
-    DeformableObjectCfg,
 )
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
@@ -232,7 +231,7 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
             "static_friction_range": (0.7, 1.0),
             "dynamic_friction_range": (0.4, 0.7),
-            "restitution_range": (0.0, 0.4),
+            "restitution_range": (0.0, 0.3),
             "num_buckets": 64,
         },
     )
@@ -254,7 +253,7 @@ class EventCfg:
             "asset_cfg": SceneEntityCfg("ball", body_names=".*"),
             "static_friction_range": (0.8, 1.0),
             "dynamic_friction_range": (0.6, 0.8),
-            "restitution_range": (0.4, 0.8),
+            "restitution_range": (0.3, 0.6),
             "num_buckets": 64,
         },
     )

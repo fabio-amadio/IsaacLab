@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+import math
 from isaaclab.assets import ArticulationCfg
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
@@ -148,8 +149,8 @@ class G1Dof23BaseWalkRewards(RewardsCfg):
                     ".*_shoulder_pitch_joint",
                     ".*_shoulder_roll_joint",
                     ".*_shoulder_yaw_joint",
-                    ".*_wrist_roll_joint",
                     ".*_elbow_joint",
+                    ".*_wrist_roll_joint",
                 ],
             )
         },
@@ -168,7 +169,7 @@ class G1Dof23CatchBallRewards(G1Dof23BaseWalkRewards):
 
     # Reward for keeping the hands close to the ball
     ball_close_to_hands = RewTerm(
-        func=mdp.ball_close_to_hands_exp, weight=1.0, params={"std": 0.6}
+        func=mdp.ball_close_to_hands_exp, weight=2.0, params={"std": 0.6}
     )
 
     # Reward for keeping the hands orientation consistent
@@ -188,15 +189,15 @@ class G1Dof23CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
         # Scene
         self.scene.robot = G1_23DOF_RUBBER_HANDS_MINIMAL_CFG.replace(
             prim_path="{ENV_REGEX_NS}/Robot",
-            init_state=ArticulationCfg.InitialStateCfg(
-                pos=(0.0, 0.0, 0.74),
-                joint_pos={
-                    ".*_hip_pitch_joint": -0.20,
-                    ".*_knee_joint": 0.42,
-                    ".*_ankle_pitch_joint": -0.23,
-                },
-                joint_vel={".*": 0.0},
-            ),
+            # init_state=ArticulationCfg.InitialStateCfg(
+            #     pos=(0.0, 0.0, 0.74),
+            #     joint_pos={
+            #         ".*_hip_pitch_joint": -0.20,
+            #         ".*_knee_joint": 0.42,
+            #         ".*_ankle_pitch_joint": -0.23,
+            #     },
+            #     joint_vel={".*": 0.0},
+            # ),
         )
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso_link"
 
@@ -229,7 +230,8 @@ class G1Dof23CatchBallRoughEnvCfg(CatchBallAndLocomotionVelocityRoughEnvCfg):
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
-        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (-0.5, 0.5)
+        self.commands.base_velocity.ranges.heading = (-math.pi/2, math.pi/2)
 
 
 @configclass
@@ -256,6 +258,11 @@ class G1Dof23CatchBallRoughOnlyWalkEnvCfg(G1Dof23CatchBallRoughEnvCfg):
             "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
         )
 
+        # Commands
+        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
+        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+
         # remove ball from the scene
         self.scene.ball = None
 
@@ -263,26 +270,14 @@ class G1Dof23CatchBallRoughOnlyWalkEnvCfg(G1Dof23CatchBallRoughEnvCfg):
         self.observations.policy.ball_pos = ObsTerm(
             func=mdp.dummy_zero_obs,
             params={"dim": 3},
-            noise=Unoise(n_min=-10, n_max=10),
+            noise=Unoise(n_min=-3, n_max=3),
         )
         self.observations.policy.ball_vel = ObsTerm(
             func=mdp.dummy_zero_obs,
             params={"dim": 6},
-            noise=Unoise(n_min=-10, n_max=10),  # TODO: check this noise size
+            noise=Unoise(n_min=-3, n_max=3),
         )
         self.events.ball_physics_material = None
         self.events.ball_physics_mass = None
         self.events.reset_ball = None
         self.terminations.ball_dropped = None
-
-
-@configclass
-class G1Dof23CatchBallRoughStandingEnvCfg(G1Dof23CatchBallRoughEnvCfg):
-    def __post_init__(self):
-        # post init of parent
-        super().__post_init__()
-
-        # set null velocity commands
-        self.commands.base_velocity.ranges.lin_vel_x = (0, 0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0, 0)
-        self.commands.base_velocity.ranges.ang_vel_z = (0, 0)

@@ -14,6 +14,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
+from isaaclab.assets import RigidObject, DeformableObject
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import ContactSensor
 from isaaclab.utils.math import (
@@ -73,12 +74,12 @@ def feet_air_time_positive_biped(
     in_contact = contact_time > 0.0
     in_mode_time = torch.where(in_contact, contact_time, air_time)
     single_stance = torch.sum(in_contact.int(), dim=1) == 1
-    reward = torch.min(
-        torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
-    )[0]
-    # reward = torch.mean(
+    # reward = torch.min(
     #     torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
-    # )
+    # )[0]
+    reward = torch.mean(
+        torch.where(single_stance.unsqueeze(-1), in_mode_time, 0.0), dim=1
+    )
     reward = torch.clamp(reward, max=threshold)
     # no reward for zero command
     reward *= (
@@ -382,12 +383,14 @@ def soft_ball_close_to_hands_exp(
 def ball_speed(
     env,
     ball_cfg: SceneEntityCfg = SceneEntityCfg("ball"),
+    robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
 ) -> torch.Tensor:
-    """Penalize ball velocity when grasped (SE kernel used to filter with ball-robot distance)."""
+    """Penalize ball velocity w.r.t. the robot."""
     # extract the used quantities (to enable type-hinting)
+    robot = env.scene[robot_cfg.name]
     ball = env.scene[ball_cfg.name]
-    ball_vel = ball.data.root_link_lin_vel_w
-    return ball_vel.norm(dim=1)
+    vel_diff = ball.data.root_link_lin_vel_w - robot.data.root_link_lin_vel_w
+    return vel_diff.norm(dim=1)
 
 
 def dropping_ball(
