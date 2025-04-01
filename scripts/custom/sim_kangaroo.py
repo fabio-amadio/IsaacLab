@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""This script demonstrates how to run the RL environment for the G1."""
+"""This script demonstrates how to run the RL environment for the Kangaroo."""
 
 """Launch Isaac Sim Simulator first."""
 
@@ -39,23 +39,19 @@ import pdb
 
 from isaaclab.envs import ManagerBasedRLEnv, ManagerBasedRLEnvCfg
 
-from isaaclab_tasks.manager_based.locomanipulation.catch_ball.config.g1_23dof.flat_env_cfg import (
-    G1Dof23CatchBallFlatEnvCfg,
-    G1Dof23CatchBallFlatOnlyWalkEnvCfg,
+from isaaclab_tasks.manager_based.locomotion.velocity.config.kangaroo.flat_env_cfg import (
+    KangarooFlatEnvCfg,
 )
-
-import isaaclab_tasks  # noqa: F401
 
 
 def main():
     """Main function."""
     # create environment configuration
-    env_cfg = G1Dof23CatchBallFlatOnlyWalkEnvCfg()
+    env_cfg = KangarooFlatEnvCfg()
     env_cfg.scene.num_envs = args_cli.num_envs
 
     init_state = env_cfg.scene.robot.init_state
     # print(env.scene.articulations["robot"].data.default_joint_pos[0,:])
-    # print(init_state)
 
     # create isaac environment
     env = ManagerBasedRLEnv(cfg=env_cfg)
@@ -66,15 +62,20 @@ def main():
         # run everything in inference mode
         with torch.inference_mode():
             # agent stepping
-            actions = torch.zeros_like(env.action_manager.action)
+            actions = 0.01 * torch.rand_like(env.action_manager.action)
+            # print("actions", actions.shape)
+            # print("joint_names", env.scene.articulations["robot"].joint_names)
+            # print("joint_pos", env.scene.articulations["robot"].data.joint_pos)
+            # print("body_names", env.scene.articulations["robot"].data.body_names)
+
+            print("actuators\n", env.scene.articulations["robot"].actuators["motor"])
+            print(
+                "default_joint_pos_limits\n",
+                env.scene.articulations["robot"].data.default_joint_pos_limits,
+            )
             # env stepping
             obs, rew, terminated, truncated, info = env.step(actions)
-            # print(env.scene.articulations["robot"].body_names)
-            # print(env.scene.articulations["robot"].data.root_link_pos_w)
-            # print(env.scene.articulations["robot"].data.root_link_pos_w.shape)
-            # print(env.scene.rigid_objects["ball"].root_physx_view)
-            # print("physics_dt", env.scene.physics_dt)
-            
+
     # close the simulator
     env.close()
 

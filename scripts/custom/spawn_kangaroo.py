@@ -21,7 +21,9 @@ import torch
 from isaaclab.app import AppLauncher
 
 # add argparse arguments
-parser = argparse.ArgumentParser(description="This script demonstrates how to simulate bipedal robots.")
+parser = argparse.ArgumentParser(
+    description="This script demonstrates how to simulate bipedal robots."
+)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 # parse the arguments
@@ -53,9 +55,11 @@ def design_scene(sim: sim_utils.SimulationContext) -> tuple[list, torch.Tensor]:
     cfg.func("/World/Light", cfg)
 
     # Define origins
-    origins = torch.tensor([
-        [0.0, 0.0, 0.0],
-    ]).to(device=sim.device)
+    origins = torch.tensor(
+        [
+            [0.0, 0.0, 0.0],
+        ]
+    ).to(device=sim.device)
 
     # Robots
     kangaroo = Articulation(KANGAROO_CFG.replace(prim_path="/World/kangaroo"))
@@ -64,7 +68,9 @@ def design_scene(sim: sim_utils.SimulationContext) -> tuple[list, torch.Tensor]:
     return robots, origins
 
 
-def run_simulator(sim: sim_utils.SimulationContext, robots: list[Articulation], origins: torch.Tensor):
+def run_simulator(
+    sim: sim_utils.SimulationContext, robots: list[Articulation], origins: torch.Tensor
+):
     """Runs the simulation loop."""
     # Define simulation stepping
     sim_dt = sim.get_physics_dt()
@@ -79,7 +85,19 @@ def run_simulator(sim: sim_utils.SimulationContext, robots: list[Articulation], 
             count = 0
             for index, robot in enumerate(robots):
                 # reset dof state
-                joint_pos, joint_vel = robot.data.default_joint_pos, robot.data.default_joint_vel
+                # print("joint_names", robot.data.joint_names)
+                # print("num_joints", len(robot.data.joint_names))
+                print("actuators\n", robot.actuators["motor"])
+                print(
+                    "default_joint_pos_limits\n",
+                    robot.data.default_joint_pos_limits[
+                        :, robot.actuators["motor"].joint_indices, :
+                    ],
+                )
+                joint_pos, joint_vel = (
+                    robot.data.default_joint_pos,
+                    robot.data.default_joint_vel,
+                )
                 robot.write_joint_state_to_sim(joint_pos, joint_vel)
                 root_state = robot.data.default_root_state.clone()
                 root_state[:, :3] += origins[index]

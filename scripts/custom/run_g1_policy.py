@@ -69,7 +69,7 @@ def main():
 
     # specify directory for logging experiments
     log_root_path = os.path.join(
-        "IsaacLab", "logs", "rsl_rl", agent_cfg.experiment_name
+        "logs", "rsl_rl", agent_cfg.experiment_name
     )
     log_root_path = os.path.abspath(log_root_path)
     print(f"[INFO] Loading experiment from directory: {log_root_path}")
@@ -121,6 +121,14 @@ def main():
             # print("left_ankle_roll_link", robot.body_names.index("left_ankle_roll_link"))
             # print("right_ankle_roll_link", robot.body_names.index("right_ankle_roll_link"))
 
+
+            print("actions", actions)
+            print(
+                "default_joint_pos_limits\n",
+                robot.data.default_joint_pos_limits[
+                    :, robot.actuators["legs"].joint_indices, :
+                ],
+            )
 
             base_height.append(robot.data.root_pos_w[:, 2].cpu().detach().numpy())
 
@@ -236,19 +244,19 @@ def main():
     right_contact_forces = np.array(right_contact_forces)
 
 
-    np.save("base_height.npy", base_height)
-    np.save("left_step_height.npy", left_step_height)
-    np.save("right_step_height.npy", right_step_height)
-    np.save("left_current_air_time.npy", left_current_air_time)
-    np.save("left_last_air_time.npy", left_last_air_time)
-    np.save("right_current_air_time.npy", right_current_air_time)
-    np.save("right_last_air_time.npy", right_last_air_time)
-    np.save("left_current_contact_time.npy", left_current_contact_time)
-    np.save("left_last_contact_time.npy", left_last_contact_time)
-    np.save("right_current_contact_time.npy", right_current_contact_time)
-    np.save("right_last_contact_time.npy", right_last_contact_time)
-    np.save("left_contact_forces.npy", left_contact_forces)
-    np.save("right_contact_forces.npy", right_contact_forces)
+    # np.save("base_height.npy", base_height)
+    # np.save("left_step_height.npy", left_step_height)
+    # np.save("right_step_height.npy", right_step_height)
+    # np.save("left_current_air_time.npy", left_current_air_time)
+    # np.save("left_last_air_time.npy", left_last_air_time)
+    # np.save("right_current_air_time.npy", right_current_air_time)
+    # np.save("right_last_air_time.npy", right_last_air_time)
+    # np.save("left_current_contact_time.npy", left_current_contact_time)
+    # np.save("left_last_contact_time.npy", left_last_contact_time)
+    # np.save("right_current_contact_time.npy", right_current_contact_time)
+    # np.save("right_last_contact_time.npy", right_last_contact_time)
+    # np.save("left_contact_forces.npy", left_contact_forces)
+    # np.save("right_contact_forces.npy", right_contact_forces)
 
 
 if __name__ == "__main__":

@@ -31,7 +31,7 @@ KANGAROO_CFG = ArticulationCfg(
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 1.03),
+        pos=(0.0, 0.0, 0.98),
         joint_pos={
             "leg_left_.*": 0.0,
             "leg_right_.*": 0.0,

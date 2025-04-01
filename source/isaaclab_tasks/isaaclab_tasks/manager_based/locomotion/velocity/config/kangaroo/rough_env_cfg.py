@@ -5,10 +5,14 @@
 
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass
 
 import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
-from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import LocomotionVelocityRoughEnvCfg, RewardsCfg
+from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
+    LocomotionVelocityRoughEnvCfg,
+    RewardsCfg,
+)
 
 ##
 # Pre-defined configs
@@ -23,11 +27,13 @@ class KangarooRewards(RewardsCfg):
     termination_penalty = RewTerm(func=mdp.is_terminated, weight=-200.0)
     track_lin_vel_xy_exp = RewTerm(
         func=mdp.track_lin_vel_xy_yaw_frame_exp,
-        weight=2.0,  # 1.0
+        weight=1.0,
         params={"command_name": "base_velocity", "std": 0.5},
     )
     track_ang_vel_z_exp = RewTerm(
-        func=mdp.track_ang_vel_z_world_exp, weight=2.0, params={"command_name": "base_velocity", "std": 0.5}
+        func=mdp.track_ang_vel_z_world_exp,
+        weight=2.0,
+        params={"command_name": "base_velocity", "std": 0.5},
     )
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
@@ -39,73 +45,92 @@ class KangarooRewards(RewardsCfg):
         },
     )
 
-    # feet_slide = RewTerm(
-    #     func=mdp.feet_slide,
-    #     weight=-0.1,
-    #     params={
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
-    #     },
-    # )
-
-    # Penalize motor joint limits
-    dof_pos_limits = RewTerm(
-        func=mdp.joint_pos_limits,
-        weight=-1.0,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=[
-                "leg_left_1_motor",
-                "leg_right_1_motor",
-                "leg_left_2_motor",
-                "leg_right_2_motor",
-                "leg_left_3_motor",
-                "leg_right_3_motor",
-                # "leg_left_4_motor",    # enccourage this joints to move
-                # "leg_right_4_motor",
-                # "leg_left_5_motor",
-                # "leg_right_5_motor",
-                # "leg_left_length_motor",
-                # "leg_right_length_motor",
-            ],)},
+    feet_slide = RewTerm(
+        func=mdp.feet_slide,
+        weight=-0.25,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
+        },
     )
 
-    # Penalize deviation from default of the joints that are not essential for locomotion
-    joint_deviation_hip = RewTerm(
-        func=mdp.joint_deviation_l1,
-        weight=-0.5,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["leg_left_2_motor", "leg_left_3_motor", "leg_right_2_motor", "leg_right_3_motor"])},
-    )
-    # joint_deviation_arms = RewTerm(
-    #     func=mdp.joint_deviation_l1,
-    #     weight=-0.1,
+    # # Penalize motor joint limits
+    # dof_pos_limits = RewTerm(
+    #     func=mdp.joint_pos_limits,
+    #     weight=-1.0,
     #     params={
     #         "asset_cfg": SceneEntityCfg(
     #             "robot",
     #             joint_names=[
-    #                 ".*_shoulder_pitch_joint",
-    #                 ".*_shoulder_roll_joint",
-    #                 ".*_shoulder_yaw_joint",
-    #                 ".*_elbow_pitch_joint",
-    #                 ".*_elbow_roll_joint",
+    #                 "leg_left_1_motor",
+    #                 "leg_right_1_motor",
+    #                 "leg_left_2_motor",
+    #                 "leg_right_2_motor",
+    #                 "leg_left_3_motor",
+    #                 "leg_right_3_motor",
+    #                 # "leg_left_4_motor",
+    #                 # "leg_right_4_motor",
+    #                 # "leg_left_5_motor",
+    #                 # "leg_right_5_motor",
+    #                 # "leg_left_length_motor",
+    #                 # "leg_right_length_motor",
     #             ],
     #         )
     #     },
     # )
 
-    # joint_deviation_torso = RewTerm(
-    #     func=mdp.joint_deviation_l1,
-    #     weight=-0.1,
-    #     params={"asset_cfg": SceneEntityCfg("robot", joint_names="torso_joint")},
+    # Penalize deviation from default of the joints that are not essential for locomotion
+    joint_deviation_hip = RewTerm(
+        func=mdp.joint_deviation_l1,
+        weight=-0.5,
+        params={
+            "asset_cfg": SceneEntityCfg(
+                "robot",
+                joint_names=[
+                    "leg_left_2_motor",
+                    "leg_left_3_motor",
+                    "leg_right_2_motor",
+                    "leg_right_3_motor",
+                ],
+            )
+        },
+    )
+
+
+@configclass
+class KangarooActionsCfg:
+    """Kangaroo Action specifications for the MDP."""
+
+    # joint_pos = mdp.JointPositionActionCfg(
+    #     asset_name="robot", joint_names=[".*_motor"], scale=0.5, use_default_offset=True
     # )
+    joint_pos = mdp.JointPositionToLimitsActionCfg(
+        asset_name="robot", joint_names=[".*_motor"], scale=0.001
+    )
+
+
+@configclass
+class KangarooTerminationsCfg:
+    """Kangaroo Termination terms for the MDP."""
+
+    time_out = DoneTerm(func=mdp.time_out, time_out=True)
+    falling = DoneTerm(
+        func=mdp.root_height_below_minimum,
+        params={"minimum_height": 0.6, "asset_cfg": SceneEntityCfg("robot")},
+    )
 
 
 @configclass
 class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: KangarooRewards = KangarooRewards()
+    actions: KangarooActionsCfg = KangarooActionsCfg()
+    terminations: KangarooTerminationsCfg = KangarooTerminationsCfg()
 
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
         # Scene
+        self.scene.num_envs = 2048
         self.scene.robot = KANGAROO_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso"
 
@@ -113,7 +138,9 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.events.push_robot = None
         self.events.add_base_mass = None
         self.events.reset_robot_joints.params["position_range"] = (1.0, 1.0)
-        self.events.base_external_force_torque.params["asset_cfg"].body_names = ["torso"]
+        self.events.base_external_force_torque.params["asset_cfg"].body_names = [
+            "torso"
+        ]
         self.events.reset_base.params = {
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
@@ -144,9 +171,6 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
-
-        # terminations
-        self.terminations.base_contact.params["sensor_cfg"].body_names = "torso"
 
 
 @configclass
