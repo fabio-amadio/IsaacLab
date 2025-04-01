@@ -105,7 +105,7 @@ class KangarooActionsCfg:
     #     asset_name="robot", joint_names=[".*_motor"], scale=0.5, use_default_offset=True
     # )
     joint_pos = mdp.JointPositionToLimitsActionCfg(
-        asset_name="robot", joint_names=[".*_motor"], scale=0.001
+        asset_name="robot", joint_names=[".*_motor"]
     )
 
 

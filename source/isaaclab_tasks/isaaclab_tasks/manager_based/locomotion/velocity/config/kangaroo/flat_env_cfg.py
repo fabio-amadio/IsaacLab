@@ -29,17 +29,21 @@ class KangarooFlatEnvCfg(KangarooRoughEnvCfg):
         self.rewards.track_ang_vel_z_exp.weight = 1.0
         self.rewards.lin_vel_z_l2.weight = -0.2
         self.rewards.action_rate_l2.weight = -0.005
-        self.rewards.dof_acc_l2.weight = -1.0e-7
-        self.rewards.feet_air_time.weight = 1.5
+        self.rewards.feet_air_time.weight = 2.0
         self.rewards.feet_air_time.params["threshold"] = 0.5
-        self.rewards.dof_torques_l2.weight = -2.0e-6
-        self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
-            "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
-        )
+        # self.rewards.dof_acc_l2.weight = -1.0e-7
+        # self.rewards.dof_torques_l2.weight = -2.0e-6
+        # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
+        # )
+        self.rewards.dof_acc_l2 = None
+        self.rewards.dof_torques_l2 = None
+        self.rewards.flat_orientation_l2 = None
+        self.rewards.undesired_contacts = None
         # Commands
-        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.6)  # (0.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-0.0, 0.0) # (-0.5, 0.5)
-        self.commands.base_velocity.ranges.ang_vel_z = (-0.0, 0.0) # (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (-0.0, 0.0)
+        self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
 
 
 class KangarooFlatEnvCfg_PLAY(KangarooFlatEnvCfg):

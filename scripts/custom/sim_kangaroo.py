@@ -61,18 +61,29 @@ def main():
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
-            # agent stepping
-            actions = 0.01 * torch.rand_like(env.action_manager.action)
-            # print("actions", actions.shape)
-            # print("joint_names", env.scene.articulations["robot"].joint_names)
-            # print("joint_pos", env.scene.articulations["robot"].data.joint_pos)
-            # print("body_names", env.scene.articulations["robot"].data.body_names)
 
-            print("actuators\n", env.scene.articulations["robot"].actuators["motor"])
-            print(
-                "default_joint_pos_limits\n",
-                env.scene.articulations["robot"].data.default_joint_pos_limits,
-            )
+            robot = env.scene.articulations["robot"]
+            actuated_joint_limits = robot.data.default_joint_pos_limits[
+                :, robot.actuators["motor"].joint_indices, :
+            ]
+
+            # agent stepping
+            actions = torch.rand_like(env.action_manager.action)
+
+            actions = actuated_joint_limits[:,:,0] + (
+                actuated_joint_limits[:,:,1] - actuated_joint_limits[:,:,0]
+            ) * actions
+
+            # print("actions", actions.shape)
+            # print("joint_names", robot.joint_names)
+            # print("joint_pos", robot.data.joint_pos)
+            # print("body_names", robot.data.body_names)
+            # print("actuators\n", robot.actuators["motor"])
+            # print(
+            #     "default_joint_pos_limits\n",
+            #     robot.data.default_joint_pos_limits,
+            # )
+
             # env stepping
             obs, rew, terminated, truncated, info = env.step(actions)
 
