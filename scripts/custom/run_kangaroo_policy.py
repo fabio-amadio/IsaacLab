@@ -124,6 +124,10 @@ def main():
             ):
                 print("[WARNING] Processed actions violate actuated joint limits.")
 
+            print("raw", raw_actions)
+            print("pro", processed_actions)
+            print("obs", obs[:, -12:])
+
 
 
     # close the simulator

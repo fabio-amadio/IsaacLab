@@ -44,5 +44,5 @@ class KangarooFlatPPORunnerCfg(KangarooRoughPPORunnerCfg):
 
         self.max_iterations = 1500
         self.experiment_name = "kangaroo_flat"
-        self.policy.actor_hidden_dims = [256, 128, 128]
-        self.policy.critic_hidden_dims = [256, 128, 128]
+        self.actor_hidden_dims=[256, 256, 128],
+        self.critic_hidden_dims=[256, 256, 128],
