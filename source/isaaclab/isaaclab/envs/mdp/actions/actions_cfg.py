@@ -124,6 +124,9 @@ class JointPositionToLimitsActionCfg(ActionTermCfg):
         This operation is performed after applying the scale factor.
     """
 
+    use_tanh: bool = False
+    """Whether to use tanh to scale the actions in the range [-1, 1]. Defaults to False."""
+
 
 @configclass
 class EMAJointPositionToLimitsActionCfg(JointPositionToLimitsActionCfg):

@@ -121,8 +121,11 @@ class JointPositionToLimitsAction(ActionTerm):
         # rescale the position targets if configured
         # this is useful when the input actions are in the range [-1, 1]
         if self.cfg.rescale_to_limits:
-            # clip to [-1, 1]
-            actions = self._processed_actions.clamp(-1.0, 1.0)
+            if not self.cfg.use_tanh:
+                # clip to [-1, 1]
+                actions = self._processed_actions.clamp(-1.0, 1.0)
+            else: 
+                actions = torch.tanh(self._processed_actions)
             # rescale within the joint limits
             actions = math_utils.unscale_transform(
                 actions,
