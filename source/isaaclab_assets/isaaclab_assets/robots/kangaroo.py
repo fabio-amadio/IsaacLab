@@ -1,7 +1,4 @@
-
-
 """Configuration for a kangaroo robot."""
-
 
 import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
@@ -27,7 +24,9 @@ KANGAROO_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False, solver_position_iteration_count=8, solver_velocity_iteration_count=4
+            enabled_self_collisions=False,
+            solver_position_iteration_count=8,
+            solver_velocity_iteration_count=4,
         ),
     ),
     init_state=ArticulationCfg.InitialStateCfg(
@@ -40,7 +39,7 @@ KANGAROO_CFG = ArticulationCfg(
     ),
     soft_joint_pos_limit_factor=0.9,
     actuators={
-        "motor":ImplicitActuatorCfg(
+        "motor": ImplicitActuatorCfg(
             joint_names_expr=[
                 "leg_left_1_motor",
                 "leg_right_1_motor",
@@ -55,9 +54,9 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_left_length_motor",
                 "leg_right_length_motor",
             ],
-            effort_limit = {
-                "leg_left_1_motor": 3000, #2000,
-                "leg_right_1_motor": 3000, #2000,
+            effort_limit={
+                "leg_left_1_motor": 3000,  # 2000,
+                "leg_right_1_motor": 3000,  # 2000,
                 "leg_left_2_motor": 3000,
                 "leg_right_2_motor": 3000,
                 "leg_left_3_motor": 3000,
@@ -69,7 +68,7 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_left_length_motor": 5000,
                 "leg_right_length_motor": 5000,
             },
-            velocity_limit= {
+            velocity_limit={
                 "leg_left_1_motor": 0.4,
                 "leg_right_1_motor": 0.4,
                 "leg_left_2_motor": 0.4,
@@ -83,8 +82,8 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.625,
                 "leg_right_length_motor": 0.625,
             },
-            stiffness= 10000000.0,
-            damping= {
+            stiffness=10000000.0,
+            damping={
                 "leg_left_1_motor": 2000,
                 "leg_right_1_motor": 2000,
                 "leg_left_2_motor": 2000,
@@ -98,7 +97,7 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_left_length_motor": 5000,
                 "leg_right_length_motor": 5000,
             },
-            armature= {
+            armature={
                 "leg_left_1_motor": 0.01,
                 "leg_right_1_motor": 0.01,
                 "leg_left_2_motor": 0.01,
@@ -112,7 +111,6 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.01,
                 "leg_right_length_motor": 0.01,
             },
-
-        ), 
-    }
+        ),
+    },
 )

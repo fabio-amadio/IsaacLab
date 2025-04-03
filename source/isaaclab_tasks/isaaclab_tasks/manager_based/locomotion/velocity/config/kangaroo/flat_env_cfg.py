@@ -59,3 +59,8 @@ class KangarooFlatEnvCfg_PLAY(KangarooFlatEnvCfg):
         # remove random pushing
         self.events.base_external_force_torque = None
         self.events.push_robot = None
+        self.events.physics_material = None
+        self.events.add_base_mass = None
+        self.events.reset_base = None
+        self.reset_robot_joints = None
+        

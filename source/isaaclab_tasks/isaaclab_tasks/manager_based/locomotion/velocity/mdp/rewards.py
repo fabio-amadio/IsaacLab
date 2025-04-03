@@ -104,3 +104,109 @@ def track_ang_vel_z_world_exp(
     asset = env.scene[asset_cfg.name]
     ang_vel_error = torch.square(env.command_manager.get_command(command_name)[:, 2] - asset.data.root_ang_vel_w[:, 2])
     return torch.exp(-ang_vel_error / std**2)
+
+
+"""Custom rewards and penalties"""
+
+
+def contact_time(
+    env: ManagerBasedRLEnv,
+    command_name: str,
+    sensor_cfg: SceneEntityCfg,
+    threshold: float,
+) -> torch.Tensor:
+    """Reward feet contact time using L2-kernel.
+
+    This function rewards the agent for contact times longer than a threshold. This helps avoiding
+    rapid bouncing behavior that are unnatural.
+
+    If the commands are small (i.e. the agent is not supposed to take a step), then the reward is zero.
+    """
+    # extract the used quantities (to enable type-hinting)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    # compute the reward
+    first_contact = contact_sensor.compute_first_contact(env.step_dt)[
+        :, sensor_cfg.body_ids
+    ]
+    last_contact_time = contact_sensor.data.last_contact_time[:, sensor_cfg.body_ids]
+    reward = torch.sum((last_contact_time - threshold) * ~first_contact, dim=1)
+    # no reward for zero command
+    reward *= (
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+    )
+    return reward
+
+
+def different_step_times(
+    env: ManagerBasedRLEnv,
+    command_name: str,
+    sensor_cfg: SceneEntityCfg,
+) -> torch.Tensor:
+    """Penalize different step times between the two feet.
+
+    If the commands are small (i.e. the agent is not supposed to take a step), then the reward is zero.
+    """
+    # extract the used quantities (to enable type-hinting)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    # compute the penalty
+    last_contact_time = contact_sensor.data.last_contact_time[:, sensor_cfg.body_ids]
+    last_air_time = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
+    penalty = 2 * (
+        torch.std(last_contact_time, dim=1) + torch.std(last_air_time, dim=1)
+    )
+    # no penalty for zero command
+    penalty *= (
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+    )
+    return penalty
+
+
+def different_air_contact_times(
+    env: ManagerBasedRLEnv,
+    command_name: str,
+    sensor_cfg: SceneEntityCfg,
+) -> torch.Tensor:
+    """Penalize huge difference between air and contact times.
+
+    If the commands are small (i.e. the agent is not supposed to take a step), then the reward is zero.
+    """
+    # extract the used quantities (to enable type-hinting)
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    # compute the penalty
+    last_contact_time = contact_sensor.data.last_contact_time[:, sensor_cfg.body_ids]
+    last_air_time = contact_sensor.data.last_air_time[:, sensor_cfg.body_ids]
+    air_contact_time_abs_diff = torch.abs(last_air_time - last_contact_time)
+    penalty = torch.sum(air_contact_time_abs_diff, dim=1)
+    # no penalty for zero command
+    penalty *= (
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+    )
+    return penalty
+
+
+def feet_swing_height(
+    env,
+    command_name: str,
+    target_height: float,
+    sensor_cfg: SceneEntityCfg,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    """Penalize distance from a reference step height (if not in contact).
+
+    If the commands are small (i.e. the agent is not supposed to take a step), then the reward is zero.
+    """
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    contacts = (
+        contact_sensor.data.net_forces_w_history[:, :, sensor_cfg.body_ids, :]
+        .norm(dim=-1)
+        .max(dim=1)[0]
+        > 1.0
+    )
+    asset = env.scene[asset_cfg.name]
+    body_height = asset.data.body_link_pos_w[:, asset_cfg.body_ids, 2]
+    penalty = torch.sum(torch.abs(body_height - target_height) * ~contacts, dim=1)
+    # no penalty for zero command
+    penalty *= (
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+    )
+    return penalty

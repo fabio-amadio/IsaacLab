@@ -61,3 +61,8 @@ _build
 
 # Pre-Trained Checkpoints
 /.pretrained_checkpoints/
+
+# Custom log files
+**/*.csv
+**/*.npy
+**/*.txt
