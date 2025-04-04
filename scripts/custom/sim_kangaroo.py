@@ -39,6 +39,7 @@ import pdb
 from isaaclab.envs import ManagerBasedRLEnv, ManagerBasedRLEnvCfg
 from isaaclab.sim import SimulationCfg
 
+import isaaclab_tasks.manager_based.locomotion.velocity.mdp as mdp
 from isaaclab_tasks.manager_based.locomotion.velocity.config.kangaroo.flat_env_cfg import (
     KangarooFlatEnvCfg_PLAY,
 )
@@ -63,7 +64,7 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
             max_depenetration_velocity=1.0,
         ),
         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=True,
+            enabled_self_collisions=False,
             solver_position_iteration_count=8,
             solver_velocity_iteration_count=4,
             fix_root_link=True,
@@ -84,15 +85,15 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_1_motor",
                 "leg_right_1_motor",
                 "leg_left_2_motor",
-                "leg_right_2_motor",
                 "leg_left_3_motor",
+                "leg_right_2_motor",
                 "leg_right_3_motor",
                 "leg_left_4_motor",
-                "leg_right_4_motor",
                 "leg_left_5_motor",
-                "leg_right_5_motor",
                 "leg_left_length_motor",
                 "leg_right_length_motor",
+                "leg_right_4_motor",
+                "leg_right_5_motor",
             ],
             effort_limit={
                 "leg_left_1_motor": 3000,  # 2000,
@@ -122,22 +123,20 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.625,
                 "leg_right_length_motor": 0.625,
             },
-            # stiffness=0,
-            # damping=0,
-            stiffness=10000000.0,
+            stiffness=500000.0,
             damping={
-                "leg_left_1_motor": 2000,
-                "leg_right_1_motor": 2000,
-                "leg_left_2_motor": 2000,
-                "leg_right_2_motor": 2000,
-                "leg_left_3_motor": 2000,
-                "leg_right_3_motor": 2000,
-                "leg_left_4_motor": 2000,
-                "leg_right_4_motor": 2000,
-                "leg_left_5_motor": 2000,
-                "leg_right_5_motor": 2000,
-                "leg_left_length_motor": 5000,
-                "leg_right_length_motor": 5000,
+                "leg_left_1_motor":         10000.0,
+                "leg_right_1_motor":        10000.0,
+                "leg_left_2_motor":         10000.0,
+                "leg_right_2_motor":        10000.0,
+                "leg_left_3_motor":         10000.0,
+                "leg_right_3_motor":        10000.0,
+                "leg_left_4_motor":         10000.0,
+                "leg_right_4_motor":        10000.0,
+                "leg_left_5_motor":         10000.0,
+                "leg_right_5_motor":        10000.0,
+                "leg_left_length_motor":    10000.0,
+                "leg_right_length_motor":   10000.0,
             },
             armature={
                 "leg_left_1_motor": 0.01,
@@ -165,6 +164,12 @@ def main():
     env_cfg.scene.num_envs = 1
     env_cfg.episode_length_s = 5.0
     env_cfg.scene.robot = KANGAROO_FIXED_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    env_cfg.actions.joint_pos = mdp.JointPositionActionCfg(
+        asset_name="robot",
+        joint_names=[".*_motor"],
+        scale=1.0,
+        use_default_offset=False,
+    )
 
     init_state = env_cfg.scene.robot.init_state
     # print(env.scene.articulations["robot"].data.default_joint_pos[0,:])
@@ -175,7 +180,8 @@ def main():
     actuated_joint_limits = robot.data.default_joint_pos_limits[
         :, robot.actuators["motor"].joint_indices, :
     ]
-    print("actuators\n", robot.actuators["motor"])
+    print("actuators joints names\n", robot.actuators["motor"].joint_names)
+    print("actuators joints indices\n", robot.actuators["motor"].joint_indices)
     env.reset()
 
     # dump the list of robot.joint_names into a CSV file
@@ -185,8 +191,15 @@ def main():
 
     # initialize action variables
     actions = torch.zeros_like(env.action_manager.action)
-    a_idx = 11  # pick between 0 and 11
-    a_step = 0.0005
+    for i, q in enumerate(
+        env.scene.articulations["robot"].data.joint_pos[
+            0, robot.actuators["motor"].joint_indices
+        ]
+    ):
+        actions[0, i] = q
+    print("actions", actions)
+    a_idx = 0  # pick between 0 and 11
+    a_step = 0.001
     a_step_dir = 1
 
     # init log lists
@@ -200,20 +213,29 @@ def main():
     while simulation_app.is_running() and count < max_steps:
         # run everything in inference mode
         with torch.inference_mode():
+            # env.sim.step()
+            # env.scene.update(dt=env_cfg.sim.dt)
+
             # if end of range is reached, reverse the increment direction
-            if (
-                a_step_dir == 1
-                and actions[0, a_idx]
-                + a_step_dir * a_step * torch.ones_like(actions[0, a_idx])
-                >= actuated_joint_limits[0, a_idx, 1] * torch.ones_like(actions[0, a_idx])
+            if a_step_dir == 1 and actions[
+                0, a_idx
+            ] + a_step_dir * a_step * torch.ones_like(
+                actions[0, a_idx]
+            ) >= actuated_joint_limits[
+                0, a_idx, 1
+            ] * torch.ones_like(
+                actions[0, a_idx]
             ):
                 a_step_dir = -1
 
-            if (
-                a_step_dir == -1
-                and actions[0, a_idx]
-                + a_step_dir * a_step * torch.ones_like(actions[0, a_idx])
-                <= actuated_joint_limits[0, a_idx, 0] * torch.ones_like(actions[0, a_idx])
+            if a_step_dir == -1 and actions[
+                0, a_idx
+            ] + a_step_dir * a_step * torch.ones_like(
+                actions[0, a_idx]
+            ) <= actuated_joint_limits[
+                0, a_idx, 0
+            ] * torch.ones_like(
+                actions[0, a_idx]
             ):
                 a_step_dir = 1
 
@@ -239,8 +261,8 @@ def main():
 
             # env stepping
             obs, rew, terminated, truncated, info = env.step(actions)
-            count += 1
 
+            count += 1
 
     # close the simulator
     env.close()

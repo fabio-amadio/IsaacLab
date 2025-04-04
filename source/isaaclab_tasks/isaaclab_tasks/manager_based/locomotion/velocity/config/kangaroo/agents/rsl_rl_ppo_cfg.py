@@ -42,7 +42,7 @@ class KangarooFlatPPORunnerCfg(KangarooRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.max_iterations = 1500
+        self.max_iterations = 1000
         self.experiment_name = "kangaroo_flat"
         self.actor_hidden_dims=[256, 256, 128],
         self.critic_hidden_dims=[256, 256, 128],

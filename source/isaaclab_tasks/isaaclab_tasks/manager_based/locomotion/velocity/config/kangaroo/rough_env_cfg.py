@@ -48,9 +48,19 @@ class KangarooRewards(RewardsCfg):
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-            "threshold": 0.4,
+            "threshold": 0.1,
         },
     )
+
+    # feet_air_time = RewTerm(
+    #     func=mdp.feet_air_time,
+    #     weight=0.25,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #         "threshold": 0.1,
+    #     },
+    # )
 
     feet_slide = RewTerm(
         func=mdp.feet_slide,
@@ -106,7 +116,7 @@ class KangarooRewards(RewardsCfg):
     # Penalize base height distance from a given target
     base_height_l2 = RewTerm(
         func=mdp.base_height_l2,
-        weight=-0.25,
+        weight=-0.50,
         params={
             "target_height": 0.97,
         },
@@ -115,7 +125,7 @@ class KangarooRewards(RewardsCfg):
     # Penalize uneven step times between the two feets
     different_step_times = RewTerm(
         func=mdp.different_step_times,
-        weight=-0.25,
+        weight=-0.50,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -125,7 +135,7 @@ class KangarooRewards(RewardsCfg):
     # Penalize too different feet air and contact times
     different_air_contact_times = RewTerm(
         func=mdp.different_air_contact_times,
-        weight=-0.25,
+        weight=-0.50,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -135,7 +145,7 @@ class KangarooRewards(RewardsCfg):
     # Penalize small swing feet height
     feet_swing_height = RewTerm(
         func=mdp.feet_swing_height,
-        weight=-0.25,
+        weight=-0.50,
         params={
             "command_name": "base_velocity",
             "target_height": 0.10,

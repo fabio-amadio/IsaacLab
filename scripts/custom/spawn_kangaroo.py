@@ -56,7 +56,7 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
         usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=False,
+            disable_gravity=True,
             retain_accelerations=False,
             linear_damping=0.0,
             angular_damping=0.0,
@@ -86,15 +86,15 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_1_motor",
                 "leg_right_1_motor",
                 "leg_left_2_motor",
-                "leg_right_2_motor",
                 "leg_left_3_motor",
+                "leg_right_2_motor",
                 "leg_right_3_motor",
                 "leg_left_4_motor",
-                "leg_right_4_motor",
                 "leg_left_5_motor",
-                "leg_right_5_motor",
                 "leg_left_length_motor",
                 "leg_right_length_motor",
+                "leg_right_4_motor",
+                "leg_right_5_motor",
             ],
             effort_limit={
                 "leg_left_1_motor": 3000,  # 2000,
@@ -124,37 +124,35 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.625,
                 "leg_right_length_motor": 0.625,
             },
-            # stiffness=0,
-            # damping=0,
-            stiffness=10000000.0,
+            stiffness=100000.0,
             damping={
-                "leg_left_1_motor": 2000,
-                "leg_right_1_motor": 2000,
-                "leg_left_2_motor": 2000,
-                "leg_right_2_motor": 2000,
-                "leg_left_3_motor": 2000,
-                "leg_right_3_motor": 2000,
-                "leg_left_4_motor": 2000,
-                "leg_right_4_motor": 2000,
-                "leg_left_5_motor": 2000,
-                "leg_right_5_motor": 2000,
-                "leg_left_length_motor": 5000,
-                "leg_right_length_motor": 5000,
+                "leg_left_1_motor": 632.5,
+                "leg_right_1_motor": 632.5,
+                "leg_left_2_motor": 632.5,
+                "leg_right_2_motor": 632.5,
+                "leg_left_3_motor": 632.5,
+                "leg_right_3_motor": 632.5,
+                "leg_left_4_motor": 632.5,
+                "leg_right_4_motor": 632.5,
+                "leg_left_5_motor": 632.5,
+                "leg_right_5_motor": 632.5,
+                "leg_left_length_motor": 632.5,
+                "leg_right_length_motor": 632.5,
             },
-            armature={
-                "leg_left_1_motor": 0.01,
-                "leg_right_1_motor": 0.01,
-                "leg_left_2_motor": 0.01,
-                "leg_right_2_motor": 0.01,
-                "leg_left_3_motor": 0.01,
-                "leg_right_3_motor": 0.01,
-                "leg_left_4_motor": 0.01,
-                "leg_right_4_motor": 0.01,
-                "leg_left_5_motor": 0.01,
-                "leg_right_5_motor": 0.01,
-                "leg_left_length_motor": 0.01,
-                "leg_right_length_motor": 0.01,
-            },
+            # armature={
+            #     "leg_left_1_motor": 0.01,
+            #     "leg_right_1_motor": 0.01,
+            #     "leg_left_2_motor": 0.01,
+            #     "leg_right_2_motor": 0.01,
+            #     "leg_left_3_motor": 0.01,
+            #     "leg_right_3_motor": 0.01,
+            #     "leg_left_4_motor": 0.01,
+            #     "leg_right_4_motor": 0.01,
+            #     "leg_left_5_motor": 0.01,
+            #     "leg_right_5_motor": 0.01,
+            #     "leg_left_length_motor": 0.01,
+            #     "leg_right_length_motor": 0.01,
+            # },
         ),
     },
 )
@@ -208,22 +206,22 @@ def run_simulator(
                 #         :, robot.actuators["motor"].joint_indices, :
                 #     ],
                 # )
-                # joint_pos, joint_vel = (
-                #     robot.data.default_joint_pos,
-                #     robot.data.default_joint_vel,
-                # )
-                # robot.write_joint_state_to_sim(joint_pos, joint_vel)
-                # root_state = robot.data.default_root_state.clone()
-                # root_state[:, :3] += origins[index]
-                # robot.write_root_pose_to_sim(root_state[:, :7])
-                # robot.write_root_velocity_to_sim(root_state[:, 7:])
+                joint_pos, joint_vel = (
+                    robot.data.default_joint_pos,
+                    robot.data.default_joint_vel,
+                )
+                robot.write_joint_state_to_sim(joint_pos, joint_vel)
+                root_state = robot.data.default_root_state.clone()
+                root_state[:, :3] += origins[index]
+                robot.write_root_pose_to_sim(root_state[:, :7])
+                robot.write_root_velocity_to_sim(root_state[:, 7:])
                 robot.reset()
             # reset command
             print(">>>>>>>> Reset!")
         # apply action to the robot
-        for robot in robots:
-            robot.set_joint_position_target(robot.data.default_joint_pos.clone())
-            robot.write_data_to_sim()
+        # for robot in robots:
+        #     robot.set_joint_position_target(robot.data.default_joint_pos.clone())
+        #     robot.write_data_to_sim()
         # perform step
         sim.step()
         # update sim-time
