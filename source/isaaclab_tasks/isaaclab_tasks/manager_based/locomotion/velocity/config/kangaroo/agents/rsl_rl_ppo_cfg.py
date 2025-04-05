@@ -3,7 +3,11 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from isaaclab_rl.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlPpoActorCriticCfg, RslRlPpoAlgorithmCfg
+from isaaclab_rl.rsl_rl import (
+    RslRlOnPolicyRunnerCfg,
+    RslRlPpoActorCriticCfg,
+    RslRlPpoAlgorithmCfg,
+)
 
 from isaaclab.utils import configclass
 
@@ -11,14 +15,14 @@ from isaaclab.utils import configclass
 @configclass
 class KangarooRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     num_steps_per_env = 24
-    max_iterations = 3000
+    max_iterations = 1000  # 3000
     save_interval = 50
     experiment_name = "kangaroo_rough"
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         init_noise_std=1.0,
-        actor_hidden_dims=[512, 256, 128],
-        critic_hidden_dims=[512, 256, 128],
+        actor_hidden_dims=[256, 256, 128],  # [512, 256, 128]
+        critic_hidden_dims=[256, 256, 128],
         activation="elu",
     )
     algorithm = RslRlPpoAlgorithmCfg(
@@ -44,5 +48,5 @@ class KangarooFlatPPORunnerCfg(KangarooRoughPPORunnerCfg):
 
         self.max_iterations = 1000
         self.experiment_name = "kangaroo_flat"
-        self.actor_hidden_dims=[256, 256, 128],
-        self.critic_hidden_dims=[256, 256, 128],
+        self.actor_hidden_dims = ([256, 256, 128],)
+        self.critic_hidden_dims = ([256, 256, 128],)
