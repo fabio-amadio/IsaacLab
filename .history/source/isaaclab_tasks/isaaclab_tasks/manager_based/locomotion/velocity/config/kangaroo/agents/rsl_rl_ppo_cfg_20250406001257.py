@@ -45,6 +45,8 @@ class KangarooRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 class KangarooFlatPPORunnerCfg(KangarooRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
+        
+        self.clip_actions = True
         self.max_iterations = 1000
         self.experiment_name = "kangaroo_flat"
         self.actor_hidden_dims = ([256, 256, 128],)

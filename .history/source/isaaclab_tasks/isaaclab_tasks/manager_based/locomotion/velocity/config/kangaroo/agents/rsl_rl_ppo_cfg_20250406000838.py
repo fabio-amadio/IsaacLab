@@ -14,6 +14,7 @@ from isaaclab.utils import configclass
 
 @configclass
 class KangarooRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+    clip_actions: bool = True
     num_steps_per_env = 24
     max_iterations = 1000  # 3000
     save_interval = 50
@@ -45,6 +46,8 @@ class KangarooRoughPPORunnerCfg(RslRlOnPolicyRunnerCfg):
 class KangarooFlatPPORunnerCfg(KangarooRoughPPORunnerCfg):
     def __post_init__(self):
         super().__post_init__()
+        
+
         self.max_iterations = 1000
         self.experiment_name = "kangaroo_flat"
         self.actor_hidden_dims = ([256, 256, 128],)

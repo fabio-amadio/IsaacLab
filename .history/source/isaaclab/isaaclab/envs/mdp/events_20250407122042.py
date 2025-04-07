@@ -818,10 +818,7 @@ def push_by_setting_velocity(
     vel_w += math_utils.sample_uniform(ranges[:, 0], ranges[:, 1], vel_w.shape, device=asset.device)
     # set the velocities into the physics simulation
     asset.write_root_velocity_to_sim(vel_w, env_ids=env_ids)
-
-    import time
-    print(f"[EVENT] Push Robot {env_ids} at {time.time()} with velocity {vel_w[0, 0:3]} and angular velocity {vel_w[0, 3:6]}")
-
+    
 
 
 def reset_root_state_uniform(

@@ -138,21 +138,6 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
 
-    # obs, _ = env.reset()
-    # print("🔍 obs type:", type(obs))  # 检查是不是 dict
-
-    # if isinstance(obs, dict):
-    #     print("\n🟢 Observation shapes per group:")
-    #     for group_name, group_obs in obs.items():
-    #         print(f"\n=== Observation Group: {group_name} ===")
-    #         if isinstance(group_obs, dict):
-    #             for k, v in group_obs.items():
-    #                 print(f"{k:20s} shape: {v.shape}")
-    #         else:
-    #             print(f"(flattened group) shape: {group_obs.shape}")
-    # else:
-    #     print("❗ obs is not a dictionary, shape:", obs.shape)
-
     # convert to single-agent instance if required by the RL algorithm
     if isinstance(env.unwrapped, DirectMARLEnv):
         env = multi_agent_to_single_agent(env)

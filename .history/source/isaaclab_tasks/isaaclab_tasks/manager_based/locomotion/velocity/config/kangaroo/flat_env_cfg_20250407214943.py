@@ -46,7 +46,7 @@ class KangarooFlatEnvCfg(KangarooRoughEnvCfg):
 
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_y = (-0.0, 0.0)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
 
         # self.clip_actions = True
@@ -76,5 +76,5 @@ class KangarooFlatEnvCfg_PLAY(KangarooFlatEnvCfg):
         self.events.physics_material = None
         self.events.add_base_mass = None
         self.events.reset_base = None
-        self.events.reset_robot_joints = None
+        self.reset_robot_joints = None
         

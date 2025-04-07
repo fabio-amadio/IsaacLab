@@ -52,7 +52,7 @@ from isaaclab_assets import ISAACLAB_ASSETS_DATA_DIR
 
 KANGAROO_FIXED_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path=f"omniverse://localhost/Users/jlcucumber/Kangaroo_!/kangaroo/kangaroo_customed_2.usd", # f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo.usd"
+        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo.usd",
         activate_contact_sensors=True,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=True,
@@ -123,31 +123,18 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.625,
                 "leg_right_length_motor": 0.625,
             },
-            stiffness={
-                "leg_left_1_motor":         1000000.0,
-                "leg_right_1_motor":        1000000.0,
-                "leg_left_2_motor":         1000000.0,
-                "leg_right_2_motor":        1000000.0,
-                "leg_left_3_motor":         1000000.0,
-                "leg_right_3_motor":        1000000.0,
-                "leg_left_4_motor":         5000000.0,
-                "leg_right_4_motor":        5000000.0,
-                "leg_left_5_motor":         5000000.0,
-                "leg_right_5_motor":        5000000.0,
-                "leg_left_length_motor":    2000000.0,
-                "leg_right_length_motor":   2000000.0,
-            },
+            stiffness=500000.0,
             damping={
-                "leg_left_1_motor":         1000.0,
-                "leg_right_1_motor":        1000.0,
-                "leg_left_2_motor":         1000.0,
-                "leg_right_2_motor":        1000.0,
-                "leg_left_3_motor":         1000.0,
-                "leg_right_3_motor":        1000.0,
-                "leg_left_4_motor":         5000.0,
-                "leg_right_4_motor":        5000.0,
-                "leg_left_5_motor":         5000.0,
-                "leg_right_5_motor":        5000.0,
+                "leg_left_1_motor":         10000.0,
+                "leg_right_1_motor":        10000.0,
+                "leg_left_2_motor":         10000.0,
+                "leg_right_2_motor":        10000.0,
+                "leg_left_3_motor":         10000.0,
+                "leg_right_3_motor":        10000.0,
+                "leg_left_4_motor":         10000.0,
+                "leg_right_4_motor":        10000.0,
+                "leg_left_5_motor":         10000.0,
+                "leg_right_5_motor":        10000.0,
                 "leg_left_length_motor":    10000.0,
                 "leg_right_length_motor":   10000.0,
             },
@@ -201,7 +188,6 @@ def main():
     with open("joint_names.csv", mode="w", newline="") as file:
         writer = csv.writer(file)
         writer.writerows([[name] for name in robot.joint_names])
-    # print(f"CSV Path : {os.path.abspath('joint_names.csv')}")
 
     # initialize action variables
     actions = torch.zeros_like(env.action_manager.action)
@@ -212,7 +198,7 @@ def main():
     ):
         actions[0, i] = q
     print("actions", actions)
-    a_idx = 8  # pick between 0 and 11
+    a_idx = 0  # pick between 0 and 11
     a_step = 0.001
     a_step_dir = 1
 

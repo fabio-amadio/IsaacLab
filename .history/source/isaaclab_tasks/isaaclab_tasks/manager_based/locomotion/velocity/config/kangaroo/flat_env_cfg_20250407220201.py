@@ -31,9 +31,6 @@ class KangarooFlatEnvCfg(KangarooRoughEnvCfg):
         self.rewards.action_rate_l2.weight = -0.005
         self.rewards.feet_air_time.weight = 2.0
         self.rewards.feet_air_time.params["threshold"] = 0.5
-
-        # self.rewards.feet_air_time_positive_biped.weight = 1.0
-
         # self.rewards.dof_acc_l2.weight = -1.0e-7
         # self.rewards.dof_torques_l2.weight = -2.0e-6
         # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
@@ -43,7 +40,6 @@ class KangarooFlatEnvCfg(KangarooRoughEnvCfg):
         self.rewards.dof_torques_l2 = None
         self.rewards.flat_orientation_l2 = None
         self.rewards.undesired_contacts = None
-
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-1.0, 1.0)
