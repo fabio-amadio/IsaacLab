@@ -123,18 +123,31 @@ KANGAROO_FIXED_CFG = ArticulationCfg(
                 "leg_left_length_motor": 0.625,
                 "leg_right_length_motor": 0.625,
             },
-            stiffness=500000.0,
+            stiffness={
+                "leg_left_1_motor":         1000000.0,
+                "leg_right_1_motor":        1000000.0,
+                "leg_left_2_motor":         1000000.0,
+                "leg_right_2_motor":        1000000.0,
+                "leg_left_3_motor":         1000000.0,
+                "leg_right_3_motor":        1000000.0,
+                "leg_left_4_motor":         5000000.0,
+                "leg_right_4_motor":        5000000.0,
+                "leg_left_5_motor":         5000000.0,
+                "leg_right_5_motor":        5000000.0,
+                "leg_left_length_motor":    2000000.0,
+                "leg_right_length_motor":   2000000.0,
+            },
             damping={
-                "leg_left_1_motor":         10000.0,
-                "leg_right_1_motor":        10000.0,
-                "leg_left_2_motor":         10000.0,
-                "leg_right_2_motor":        10000.0,
-                "leg_left_3_motor":         10000.0,
-                "leg_right_3_motor":        10000.0,
-                "leg_left_4_motor":         10000.0,
-                "leg_right_4_motor":        10000.0,
-                "leg_left_5_motor":         10000.0,
-                "leg_right_5_motor":        10000.0,
+                "leg_left_1_motor":         1000.0,
+                "leg_right_1_motor":        1000.0,
+                "leg_left_2_motor":         1000.0,
+                "leg_right_2_motor":        1000.0,
+                "leg_left_3_motor":         1000.0,
+                "leg_right_3_motor":        1000.0,
+                "leg_left_4_motor":         5000.0,
+                "leg_right_4_motor":        5000.0,
+                "leg_left_5_motor":         5000.0,
+                "leg_right_5_motor":        5000.0,
                 "leg_left_length_motor":    10000.0,
                 "leg_right_length_motor":   10000.0,
             },
@@ -198,7 +211,7 @@ def main():
     ):
         actions[0, i] = q
     print("actions", actions)
-    a_idx = 0  # pick between 0 and 11
+    a_idx = 8  # pick between 0 and 11
     a_step = 0.001
     a_step_dir = 1
 
