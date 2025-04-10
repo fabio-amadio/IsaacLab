@@ -83,32 +83,32 @@ KANGAROO_CFG = ArticulationCfg(
                 "leg_right_length_motor": 0.625,
             },
             stiffness={
-                "leg_left_1_motor":         1000000.0,
-                "leg_right_1_motor":        1000000.0,
-                "leg_left_2_motor":         1000000.0,
-                "leg_right_2_motor":        1000000.0,
-                "leg_left_3_motor":         1000000.0,
-                "leg_right_3_motor":        1000000.0,
-                "leg_left_4_motor":         5000000.0,
-                "leg_right_4_motor":        5000000.0,
-                "leg_left_5_motor":         5000000.0,
-                "leg_right_5_motor":        5000000.0,
-                "leg_left_length_motor":    2000000.0,
-                "leg_right_length_motor":   2000000.0,
+                "leg_left_1_motor": 1000000.0,
+                "leg_right_1_motor": 1000000.0,
+                "leg_left_2_motor": 1000000.0,
+                "leg_right_2_motor": 1000000.0,
+                "leg_left_3_motor": 1000000.0,
+                "leg_right_3_motor": 1000000.0,
+                "leg_left_4_motor": 5000000.0,
+                "leg_right_4_motor": 5000000.0,
+                "leg_left_5_motor": 5000000.0,
+                "leg_right_5_motor": 5000000.0,
+                "leg_left_length_motor": 2000000.0,
+                "leg_right_length_motor": 2000000.0,
             },
             damping={
-                "leg_left_1_motor":         1000.0,
-                "leg_right_1_motor":        1000.0,
-                "leg_left_2_motor":         1000.0,
-                "leg_right_2_motor":        1000.0,
-                "leg_left_3_motor":         1000.0,
-                "leg_right_3_motor":        1000.0,
-                "leg_left_4_motor":         5000.0,
-                "leg_right_4_motor":        5000.0,
-                "leg_left_5_motor":         5000.0,
-                "leg_right_5_motor":        5000.0,
-                "leg_left_length_motor":    10000.0,
-                "leg_right_length_motor":   10000.0,
+                "leg_left_1_motor": 1000.0,
+                "leg_right_1_motor": 1000.0,
+                "leg_left_2_motor": 1000.0,
+                "leg_right_2_motor": 1000.0,
+                "leg_left_3_motor": 1000.0,
+                "leg_right_3_motor": 1000.0,
+                "leg_left_4_motor": 5000.0,
+                "leg_right_4_motor": 5000.0,
+                "leg_left_5_motor": 5000.0,
+                "leg_right_5_motor": 5000.0,
+                "leg_left_length_motor": 10000.0,
+                "leg_right_length_motor": 10000.0,
             },
             # stiffness=500000.0,
             # damping={
@@ -142,3 +142,11 @@ KANGAROO_CFG = ArticulationCfg(
         ),
     },
 )
+"""Configuration for the PAL Kangaroo robot."""
+
+
+KANGAROO_MINIMAL_CFG = KANGAROO_CFG.copy()
+KANGAROO_MINIMAL_CFG.spawn.usd_path = (
+    f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo_simplified_collision.usd"
+)
+"""Configuration for the PAL Kangaroo robot with simplified collision meshes."""
