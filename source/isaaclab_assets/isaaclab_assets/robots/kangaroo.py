@@ -149,4 +149,10 @@ KANGAROO_MINIMAL_CFG = KANGAROO_CFG.copy()
 KANGAROO_MINIMAL_CFG.spawn.usd_path = (
     f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo_simplified_collision.usd"
 )
+KANGAROO_MINIMAL_CFG.spawn.articulation_props = sim_utils.ArticulationRootPropertiesCfg(
+    enabled_self_collisions=True,
+    solver_position_iteration_count=8,
+    solver_velocity_iteration_count=4,
+)
+
 """Configuration for the PAL Kangaroo robot with simplified collision meshes."""

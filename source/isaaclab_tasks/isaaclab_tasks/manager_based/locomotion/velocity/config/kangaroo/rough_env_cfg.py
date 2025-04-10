@@ -21,7 +21,7 @@ from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
 ##
 # Pre-defined configs
 ##
-from isaaclab_assets import KANGAROO_CFG  # isort: skip
+from isaaclab_assets import KANGAROO_CFG, KANGAROO_MINIMAL_CFG  # isort: skip
 from isaaclab.terrains.config.rough import SIMPLE_ROUGH_TERRAINS_CFG  # isort: skip
 
 
@@ -352,7 +352,7 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
         # Scene
         self.scene.num_envs = 2048
-        self.scene.robot = KANGAROO_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso"
         self.scene.terrain.terrain_generator = SIMPLE_ROUGH_TERRAINS_CFG
 
