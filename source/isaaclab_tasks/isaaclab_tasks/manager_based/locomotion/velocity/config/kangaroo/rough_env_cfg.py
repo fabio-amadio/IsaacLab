@@ -45,7 +45,7 @@ class KangarooRewards(RewardsCfg):
 
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
-        weight=1.0,
+        weight=2.0,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -114,48 +114,48 @@ class KangarooRewards(RewardsCfg):
     #     },
     # )
 
-    # Penalize base height distance from a given target
-    base_height_l2 = RewTerm(
-        func=mdp.base_height_l2,
-        weight=-0.50,
-        params={
-            "target_height": 0.97,
-        },
-    )
+    # # Penalize base height distance from a given target
+    # base_height_l2 = RewTerm(
+    #     func=mdp.base_height_l2,
+    #     weight=-1.0,
+    #     params={
+    #         "target_height": 0.80,
+    #     },
+    # )
 
     # Penalize uneven step times between the two feets
     different_step_times = RewTerm(
         func=mdp.different_step_times,
-        weight=-0.50,
+        weight=-0.25,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
         },
     )
 
-    # Penalize too different feet air and contact times
-    different_air_contact_times = RewTerm(
-        func=mdp.different_air_contact_times,
-        weight=-0.50,
-        params={
-            "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-        },
-    )
+    # # Penalize too different feet air and contact times
+    # different_air_contact_times = RewTerm(
+    #     func=mdp.different_air_contact_times,
+    #     weight=-0.50,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #     },
+    # )
 
-    # Penalize small swing feet height
-    feet_swing_height = RewTerm(
-        func=mdp.feet_swing_height,
-        weight=-0.50,
-        params={
-            "command_name": "base_velocity",
-            "target_height": 0.10,
-            "sensor_cfg": SceneEntityCfg(
-                "contact_forces", body_names=".*_ankle_roll", preserve_order=True
-            ),
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
-        },
-    )
+    # # Penalize small swing feet height
+    # feet_swing_height = RewTerm(
+    #     func=mdp.feet_swing_height,
+    #     weight=-1.0,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "target_height": 0.10,
+    #         "sensor_cfg": SceneEntityCfg(
+    #             "contact_forces", body_names=".*_ankle_roll", preserve_order=True
+    #         ),
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
+    #     },
+    # )
 
 
 @configclass
@@ -352,7 +352,7 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
         # Scene
         self.scene.num_envs = 2048
-        self.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = KANGAROO_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso"
         self.scene.terrain.terrain_generator = SIMPLE_ROUGH_TERRAINS_CFG
 
@@ -381,18 +381,29 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.lin_vel_z_l2.weight = -0.2
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.action_rate_l2.weight = -0.005
-        # self.rewards.dof_acc_l2.weight = -1.25e-7
-        # self.rewards.dof_acc_l2.params["asset_cfg"] = SceneEntityCfg(
-        #     "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
-        # )
-        # self.rewards.dof_torques_l2.weight = -1.5e-7
-        # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
-        #     "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
-        # )
-        self.rewards.dof_acc_l2 = None
-        self.rewards.dof_torques_l2 = None
+
+        self.rewards.dof_pos_limits = None
+
         self.rewards.flat_orientation_l2 = None
-        self.rewards.undesired_contacts = None
+
+        self.rewards.dof_acc_l2 = None
+        # self.rewards.dof_acc_l2.weight = -1e-9
+        # self.rewards.dof_acc_l2.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot", joint_names=[".*"]
+        # )
+
+        self.rewards.dof_torques_l2 = None
+        # self.rewards.dof_torques_l2.weight = -1e-9
+        # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot", joint_names=[".*"]
+        # )
+
+        # self.rewards.undesired_contacts = None
+        self.rewards.undesired_contacts.weight = -1.0
+        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg(
+            "contact_forces", body_names=".*_ankle_roll"
+        )
+        self.rewards.undesired_contacts.params["threshold"] = 600.0
 
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
