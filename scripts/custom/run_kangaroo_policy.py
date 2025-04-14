@@ -108,6 +108,8 @@ def main():
     raw_actions_list = []
     proc_actions_list = []
 
+    q_log = []
+    qdot_log = []
 
     # reset environment
     obs, _ = env.get_observations()
@@ -122,13 +124,19 @@ def main():
             # agent stepping
             actions = policy(obs)
 
-            # log 
+            # log
             observations_list.append(obs.cpu().detach().numpy())
+            
 
             # env stepping
             obs, _, _, _ = env.step(actions)
 
             robot = env.unwrapped.scene.articulations["robot"]
+            q_log.append(robot.data.joint_pos.cpu().detach().numpy())
+            qdot_log.append(robot.data.joint_vel.cpu().detach().numpy())
+
+            # print("actuators joints names\n", robot.actuators["motor"].joint_names)
+            # print("actuators joints indices\n", robot.actuators["motor"].joint_indices)
 
             raw_actions = env.unwrapped.action_manager.get_term("joint_pos").raw_actions
             processed_actions = env.unwrapped.action_manager.get_term(
@@ -268,9 +276,13 @@ def main():
     observations_list = np.array(observations_list)
     raw_actions_list = np.array(raw_actions_list)
     proc_actions_list = np.array(proc_actions_list)
+    q_log = np.array(q_log)
+    qdot_log = np.array(qdot_log)
     np.save("scripts/custom/observations_list.npy", observations_list)
     np.save("scripts/custom/raw_actions_list.npy", raw_actions_list)
     np.save("scripts/custom/proc_actions_list.npy", proc_actions_list)
+    np.save("scripts/custom/q_log.npy", q_log)
+    np.save("scripts/custom/qdot_log.npy", qdot_log)
 
     base_height = np.array(base_height)
     left_step_height = np.array(left_step_height)

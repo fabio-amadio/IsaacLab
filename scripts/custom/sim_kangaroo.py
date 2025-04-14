@@ -195,6 +195,7 @@ def main():
     ]
     print("actuators joints names\n", robot.actuators["motor"].joint_names)
     print("actuators joints indices\n", robot.actuators["motor"].joint_indices)
+    print("actuated_joint_limits\n", actuated_joint_limits)
     env.reset()
 
     # dump the list of robot.joint_names into a CSV file
@@ -211,7 +212,7 @@ def main():
     ):
         actions[0, i] = q
     print("actions", actions)
-    a_idx = 8  # pick between 0 and 11
+    a_idx = 1  # pick between 0 and 11
     a_step = 0.001
     a_step_dir = 1
 

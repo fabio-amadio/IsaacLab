@@ -193,12 +193,48 @@ class KangarooObservationsCfg:
         )
         motor_joint_pos = ObsTerm(
             func=mdp.joint_pos,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_motor")},
+            params={
+                "asset_cfg": SceneEntityCfg(
+                    "robot",
+                    joint_names=[
+                        "leg_left_1_motor",  # joint_idx: 4
+                        "leg_right_1_motor",  # joint_idx: 11
+                        "leg_left_2_motor",  # joint_idx: 18
+                        "leg_left_3_motor",  # joint_idx: 19
+                        "leg_right_2_motor",  # joint_idx: 36
+                        "leg_right_3_motor",  # joint_idx: 37
+                        "leg_left_4_motor",  # joint_idx: 38
+                        "leg_left_5_motor",  # joint_idx: 40
+                        "leg_left_length_motor",  # joint_idx: 43
+                        "leg_right_length_motor",  # joint_idx: 45
+                        "leg_right_4_motor",  # joint_idx: 46
+                        "leg_right_5_motor",  # joint_idx: 48
+                    ],
+                )
+            },
             noise=Unoise(n_min=-0.005, n_max=0.005),
         )
         motor_joint_vel = ObsTerm(
             func=mdp.joint_vel,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_motor")},
+            params={
+                "asset_cfg": SceneEntityCfg(
+                    "robot",
+                    joint_names=[
+                        "leg_left_1_motor",  # joint_idx: 4
+                        "leg_right_1_motor",  # joint_idx: 11
+                        "leg_left_2_motor",  # joint_idx: 18
+                        "leg_left_3_motor",  # joint_idx: 19
+                        "leg_right_2_motor",  # joint_idx: 36
+                        "leg_right_3_motor",  # joint_idx: 37
+                        "leg_left_4_motor",  # joint_idx: 38
+                        "leg_left_5_motor",  # joint_idx: 40
+                        "leg_left_length_motor",  # joint_idx: 43
+                        "leg_right_length_motor",  # joint_idx: 45
+                        "leg_right_4_motor",  # joint_idx: 46
+                        "leg_right_5_motor",  # joint_idx: 48
+                    ],
+                )
+            },
             noise=Unoise(n_min=-0.05, n_max=0.05),
         )
         measured_joint_pos = ObsTerm(
@@ -207,16 +243,16 @@ class KangarooObservationsCfg:
                 "asset_cfg": SceneEntityCfg(
                     "robot",
                     joint_names=[
-                        "leg_left_1_joint",
-                        "leg_left_2_joint",
-                        "leg_left_3_joint",
-                        "left_ankle_4_pendulum_joint",
-                        "left_ankle_5_pendulum_joint",
-                        "leg_right_1_joint",
-                        "leg_right_2_joint",
-                        "leg_right_3_joint",
-                        "right_ankle_4_pendulum_joint",
-                        "right_ankle_5_pendulum_joint",
+                        "leg_left_1_joint",  # joint_idx: 1
+                        "leg_right_1_joint",  # joint_idx: 2
+                        "leg_left_2_joint",  # joint_idx: 7
+                        "leg_right_2_joint",  # joint_idx: 8
+                        "leg_left_3_joint",  # joint_idx: 14
+                        "leg_right_3_joint",  # joint_idx: 15
+                        "left_ankle_4_pendulum_joint",  # joint_idx: 21
+                        "left_ankle_5_pendulum_joint",  # joint_idx: 23
+                        "right_ankle_4_pendulum_joint",  # joint_idx: 30
+                        "right_ankle_5_pendulum_joint",  # joint_idx: 32
                     ],
                 )
             },
@@ -228,16 +264,16 @@ class KangarooObservationsCfg:
                 "asset_cfg": SceneEntityCfg(
                     "robot",
                     joint_names=[
-                        "leg_left_1_joint",
-                        "leg_left_2_joint",
-                        "leg_left_3_joint",
-                        "left_ankle_4_pendulum_joint",
-                        "left_ankle_5_pendulum_joint",
-                        "leg_right_1_joint",
-                        "leg_right_2_joint",
-                        "leg_right_3_joint",
-                        "right_ankle_4_pendulum_joint",
-                        "right_ankle_5_pendulum_joint",
+                        "leg_left_1_joint",  # joint_idx: 1
+                        "leg_right_1_joint",  # joint_idx: 2
+                        "leg_left_2_joint",  # joint_idx: 7
+                        "leg_right_2_joint",  # joint_idx: 8
+                        "leg_left_3_joint",  # joint_idx: 14
+                        "leg_right_3_joint",  # joint_idx: 15
+                        "left_ankle_4_pendulum_joint",  # joint_idx: 21
+                        "left_ankle_5_pendulum_joint",  # joint_idx: 23
+                        "right_ankle_4_pendulum_joint",  # joint_idx: 30
+                        "right_ankle_5_pendulum_joint",  # joint_idx: 32
                     ],
                 )
             },
