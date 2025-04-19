@@ -126,22 +126,22 @@ class KangarooRewards(RewardsCfg):
     # Penalize uneven step times between the two feets
     different_step_times = RewTerm(
         func=mdp.different_step_times,
-        weight=-0.25,
+        weight=-0.5,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
         },
     )
 
-    # # Penalize too different feet air and contact times
-    # different_air_contact_times = RewTerm(
-    #     func=mdp.different_air_contact_times,
-    #     weight=-0.50,
-    #     params={
-    #         "command_name": "base_velocity",
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-    #     },
-    # )
+    # Penalize too different feet air and contact times
+    different_air_contact_times = RewTerm(
+        func=mdp.different_air_contact_times,
+        weight=-0.5,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+        },
+    )
 
     # # Penalize small swing feet height
     # feet_swing_height = RewTerm(
@@ -162,12 +162,12 @@ class KangarooRewards(RewardsCfg):
 class KangarooActionsCfg:
     """Kangaroo Action specifications for the MDP."""
 
-    # joint_pos = mdp.JointPositionActionCfg(
-    #     asset_name="robot", joint_names=[".*_motor"], scale=0.5, use_default_offset=True
-    # )
     joint_pos = mdp.JointPositionToLimitsActionCfg(
         asset_name="robot", joint_names=[".*_motor"], use_tanh=True, scale=0.1
     )
+    # joint_vel = mdp.JointVelocityActionCfg(
+    #     asset_name="robot", joint_names=[".*_motor"], scale=1.0
+    # )
 
 
 @configclass
@@ -212,7 +212,7 @@ class KangarooObservationsCfg:
                     ],
                 )
             },
-            noise=Unoise(n_min=-0.005, n_max=0.005),
+            noise=Unoise(n_min=-0.0025, n_max=0.0025),
         )
         motor_joint_vel = ObsTerm(
             func=mdp.joint_vel,
@@ -235,7 +235,7 @@ class KangarooObservationsCfg:
                     ],
                 )
             },
-            noise=Unoise(n_min=-0.05, n_max=0.05),
+            noise=Unoise(n_min=-0.025, n_max=0.025),
         )
         measured_joint_pos = ObsTerm(
             func=mdp.joint_pos,
@@ -418,7 +418,12 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.action_rate_l2.weight = -0.005
 
-        self.rewards.dof_pos_limits = None
+        self.rewards.dof_pos_limits.weight = None
+        # self.rewards.dof_pos_limits.weight = -0.1
+        # self.rewards.dof_pos_limits.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot",
+        #     joint_names=[".*_motor"],
+        # )
 
         self.rewards.flat_orientation_l2 = None
 
