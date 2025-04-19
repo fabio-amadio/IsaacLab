@@ -5,29 +5,101 @@ import numpy as np
 folder = "."
 
 observations = np.load(f"{folder}/observations_list.npy")
-actions = np.load(f"{folder}/proc_actions_list.npy")
+proc_actions = np.load(f"{folder}/proc_actions_list.npy")
+raw_actions = np.load("raw_actions_list.npy")
+q_log = np.load("q_log.npy")
+qdot_log = np.load("qdot_log.npy")
 
-# Plot all observations
-plt.figure(figsize=(15, 5))
-for i in range(observations.shape[2]):
-    plt.plot(observations[:, 0, i], label=f"Obs {i+1}")
-plt.title("Observations")
-plt.xlabel("Steps")
-plt.ylabel("Observation values")
-plt.grid(True)
-plt.legend()
-plt.show()
+motor_joint_idxs = [4, 11, 18, 19, 36, 37, 38, 40, 43, 45, 46, 48]
+motor_joint_names = [
+    "leg_left_1_motor",  # joint_idx: 4
+    "leg_right_1_motor",  # joint_idx: 11
+    "leg_left_2_motor",  # joint_idx: 18
+    "leg_left_3_motor",  # joint_idx: 19
+    "leg_right_2_motor",  # joint_idx: 36
+    "leg_right_3_motor",  # joint_idx: 37
+    "leg_left_4_motor",  # joint_idx: 38
+    "leg_left_5_motor",  # joint_idx: 40
+    "leg_left_length_motor",  # joint_idx: 43
+    "leg_right_length_motor",  # joint_idx: 45
+    "leg_right_4_motor",  # joint_idx: 46
+    "leg_right_5_motor",  # joint_idx: 48
+]
 
-# Plot all actions
-plt.figure(figsize=(15, 5))
-for i in range(actions.shape[2]):
-    plt.plot(actions[:, 0, i], label=f"Action {i+1}")
-plt.title("Actions")
-plt.xlabel("Steps")
-plt.ylabel("Position ref. [m]")
-plt.grid(True)
-plt.legend()
-plt.show()
+
+meas_joint_idxs = [1, 2, 7, 8, 14, 15, 21, 23, 30, 32]
+meas_joint_names = [
+    "leg_left_1_joint",  # joint_idx: 1
+    "leg_right_1_joint",  # joint_idx: 2
+    "leg_left_2_joint",  # joint_idx: 7
+    "leg_right_2_joint",  # joint_idx: 8
+    "leg_left_3_joint",  # joint_idx: 14
+    "leg_right_3_joint",  # joint_idx: 15
+    "left_ankle_4_pendulum_joint",  # joint_idx: 21
+    "left_ankle_5_pendulum_joint",  # joint_idx: 23
+    "right_ankle_4_pendulum_joint",  # joint_idx: 30
+    "right_ankle_5_pendulum_joint",  # joint_idx: 32
+]
+
+
+# # Plot the joint ref - true values
+# for i in range(len(motor_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="true", marker='o')
+#     plt.plot(proc_actions[:, :, i], label="ref", marker='o')
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
+
+# # Plot the motor joint positions
+# for i in range(len(motor_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="q", marker='o')
+#     plt.plot(observations[:, :, 12 + i], label="obs", marker='o')
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
+
+# # Plot the qdot
+# for i in range(12):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(qdot_log[:, :, motor_joint_idxs[i]], label="qdot", linestyle='-', marker='o')
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("velocity [m/s]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
+
+# # Plot the measured joint positions
+# for i in range(len(meas_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, :, meas_joint_idxs[i]], label="q", marker='o')
+#     plt.plot(observations[:, :, 36 + i], label="obs", marker='o')
+#     plt.title(meas_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
+
+# # Plot the raw actions
+# for i in range(12):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(raw_actions[:, :, i], label="act", marker='o')
+#     plt.plot(observations[:, :, -12 + i], label="obs", marker='o')
+#     plt.title(f"Raw action {i}")
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
 
 
 left_current_air_time = np.load(f"{folder}/left_current_air_time.npy")

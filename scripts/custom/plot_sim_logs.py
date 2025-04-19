@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 
 # Load the numpy array from file
 q_log = np.load("q_log.npy")
-a_log = np.load("proc_actions_list.npy")
-
-observations = np.load("observations_list.npy")
+a_log = np.load("a_log.npy")
+# a_log = np.load("proc_actions_list.npy")
+# observations = np.load("observations_list.npy")
 
 env = 0
 
@@ -76,39 +76,39 @@ for i in action_idxs:
 # |     8     | actions                         |   (12,)   |
 # +-----------+---------------------------------+-----------+
 
-# Plot the motor joint positions
-for i in range(len(motor_joint_idxs)):
-    plt.figure(figsize=(10, 5))
-    plt.plot(q_log[:, motor_joint_idxs[i]], label="q")
-    plt.plot(observations[:, :, 12 + i], label="obs")
-    plt.title(motor_joint_names[i])
-    plt.xlabel("steps")
-    plt.ylabel("position [m]")
-    plt.legend()
-    plt.grid()
-    plt.show()
+# # Plot the motor joint positions
+# for i in range(len(motor_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, motor_joint_idxs[i]], label="q")
+#     plt.plot(observations[:, :, 12 + i], label="obs")
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
 
-# Plot the measured joint positions
-for i in range(len(meas_joint_idxs)):
-    plt.figure(figsize=(10, 5))
-    plt.plot(q_log[:, meas_joint_idxs[i]], label="q")
-    plt.plot(observations[:, :, 36 + i], label="obs")
-    plt.title(meas_joint_names[i])
-    plt.xlabel("steps")
-    plt.ylabel("position [m]")
-    plt.legend()
-    plt.grid()
-    plt.show()
+# # Plot the measured joint positions
+# for i in range(len(meas_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, meas_joint_idxs[i]], label="q")
+#     plt.plot(observations[:, :, 36 + i], label="obs")
+#     plt.title(meas_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
 
-# Plot the raw actions
-raw_actions = np.load("raw_actions_list.npy")
-for i in range(12):
-    plt.figure(figsize=(10, 5))
-    plt.plot(raw_actions[:, :, i], label="act")
-    plt.plot(observations[:, :, -12 + i], label="obs")
-    plt.title(f"Raw action {i}")
-    plt.xlabel("steps")
-    plt.ylabel("position [m]")
-    plt.legend()
-    plt.grid()
-    plt.show()
+# # Plot the raw actions
+# raw_actions = np.load("raw_actions_list.npy")
+# for i in range(12):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(raw_actions[:, :, i], label="act")
+#     plt.plot(observations[:, :, -12 + i], label="obs")
+#     plt.title(f"Raw action {i}")
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()

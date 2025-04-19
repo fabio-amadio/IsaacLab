@@ -60,6 +60,10 @@ def main():
     # env_cfg.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
     env_cfg.scene.num_envs = args_cli.num_envs
 
+    env_cfg.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
+    env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
+    env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+
     agent_cfg = KangarooFlatPPORunnerCfg()
 
     # create isaac environment
@@ -114,8 +118,26 @@ def main():
     # reset environment
     obs, _ = env.get_observations()
 
+    # loaded_actions = np.load("scripts/custom/offline_raw_actions_list.npy")
+    # loaded_actions = torch.tensor(loaded_actions, device=env.unwrapped.device)
+    # print("loaded_actions", loaded_actions.shape)
+
+    robot = env.unwrapped.scene.articulations["robot"]
+    motor_joint_idxs = [4, 11, 18, 19, 36, 37, 38, 40, 43, 45, 46, 48]
+
+    
+    actuated_joint_limits = robot.data.default_joint_pos_limits[
+        :, robot.actuators["motor"].joint_indices, :
+    ]
+    default_actuated_joint_pos = robot.data.default_joint_pos[:, motor_joint_idxs]
+    print("default motor joint positions")
+    print(default_actuated_joint_pos)
+    print("actuated joint limits")
+    print(actuated_joint_limits)
+
     count = 0
     max_steps = env_cfg.episode_length_s / (env_cfg.sim.dt * env_cfg.decimation)
+    max_steps = 500
     # simulate environment
     while simulation_app.is_running() and count < max_steps:
         # run everything in inference mode
@@ -123,15 +145,14 @@ def main():
 
             # agent stepping
             actions = policy(obs)
+            # actions = loaded_actions[count, :]
 
             # log
             observations_list.append(obs.cpu().detach().numpy())
-            
 
             # env stepping
             obs, _, _, _ = env.step(actions)
 
-            robot = env.unwrapped.scene.articulations["robot"]
             q_log.append(robot.data.joint_pos.cpu().detach().numpy())
             qdot_log.append(robot.data.joint_vel.cpu().detach().numpy())
 
