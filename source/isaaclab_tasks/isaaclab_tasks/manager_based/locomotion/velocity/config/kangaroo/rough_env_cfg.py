@@ -418,7 +418,7 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.action_rate_l2.weight = -0.005
 
-        self.rewards.dof_pos_limits.weight = None
+        self.rewards.dof_pos_limits = None
         # self.rewards.dof_pos_limits.weight = -0.1
         # self.rewards.dof_pos_limits.params["asset_cfg"] = SceneEntityCfg(
         #     "robot",
