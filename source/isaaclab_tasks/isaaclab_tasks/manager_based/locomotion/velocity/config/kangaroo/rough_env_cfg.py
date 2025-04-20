@@ -21,7 +21,7 @@ from isaaclab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import (
 ##
 # Pre-defined configs
 ##
-from isaaclab_assets import KANGAROO_CFG  # isort: skip
+from isaaclab_assets import KANGAROO_CFG, KANGAROO_MINIMAL_CFG  # isort: skip
 from isaaclab.terrains.config.rough import SIMPLE_ROUGH_TERRAINS_CFG  # isort: skip
 
 
@@ -45,7 +45,7 @@ class KangarooRewards(RewardsCfg):
 
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
-        weight=1.0,
+        weight=2.0,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -114,19 +114,19 @@ class KangarooRewards(RewardsCfg):
     #     },
     # )
 
-    # Penalize base height distance from a given target
-    base_height_l2 = RewTerm(
-        func=mdp.base_height_l2,
-        weight=-0.50,
-        params={
-            "target_height": 0.97,    # How can I know the height of the robot?
-        },
-    )
+    # # Penalize base height distance from a given target
+    # base_height_l2 = RewTerm(
+    #     func=mdp.base_height_l2,
+    #     weight=-1.0,
+    #     params={
+    #         "target_height": 0.80,
+    #     },
+    # )
 
     # Penalize uneven step times between the two feets
     different_step_times = RewTerm(
         func=mdp.different_step_times,
-        weight=-0.50,
+        weight=-0.5,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -136,38 +136,38 @@ class KangarooRewards(RewardsCfg):
     # Penalize too different feet air and contact times
     different_air_contact_times = RewTerm(
         func=mdp.different_air_contact_times,
-        weight=-0.50,
+        weight=-0.5,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
         },
     )
 
-    # Penalize small swing feet height
-    feet_swing_height = RewTerm(
-        func=mdp.feet_swing_height,
-        weight=-0.50,
-        params={
-            "command_name": "base_velocity",
-            "target_height": 0.10,
-            "sensor_cfg": SceneEntityCfg(
-                "contact_forces", body_names=".*_ankle_roll", preserve_order=True
-            ),
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
-        },
-    )
+    # # Penalize small swing feet height
+    # feet_swing_height = RewTerm(
+    #     func=mdp.feet_swing_height,
+    #     weight=-1.0,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "target_height": 0.10,
+    #         "sensor_cfg": SceneEntityCfg(
+    #             "contact_forces", body_names=".*_ankle_roll", preserve_order=True
+    #         ),
+    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
+    #     },
+    # )
 
 
 @configclass
 class KangarooActionsCfg:
     """Kangaroo Action specifications for the MDP."""
 
-    # joint_pos = mdp.JointPositionActionCfg(
-    #     asset_name="robot", joint_names=[".*_motor"], scale=0.5, use_default_offset=True
-    # )
     joint_pos = mdp.JointPositionToLimitsActionCfg(
         asset_name="robot", joint_names=[".*_motor"], use_tanh=True, scale=0.1
     )
+    # joint_vel = mdp.JointVelocityActionCfg(
+    #     asset_name="robot", joint_names=[".*_motor"], scale=1.0
+    # )
 
 
 @configclass
@@ -193,13 +193,49 @@ class KangarooObservationsCfg:
         )
         motor_joint_pos = ObsTerm(
             func=mdp.joint_pos,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_motor")},
-            noise=Unoise(n_min=-0.005, n_max=0.005),
+            params={
+                "asset_cfg": SceneEntityCfg(
+                    "robot",
+                    joint_names=[
+                        "leg_left_1_motor",  # joint_idx: 4
+                        "leg_right_1_motor",  # joint_idx: 11
+                        "leg_left_2_motor",  # joint_idx: 18
+                        "leg_left_3_motor",  # joint_idx: 19
+                        "leg_right_2_motor",  # joint_idx: 36
+                        "leg_right_3_motor",  # joint_idx: 37
+                        "leg_left_4_motor",  # joint_idx: 38
+                        "leg_left_5_motor",  # joint_idx: 40
+                        "leg_left_length_motor",  # joint_idx: 43
+                        "leg_right_length_motor",  # joint_idx: 45
+                        "leg_right_4_motor",  # joint_idx: 46
+                        "leg_right_5_motor",  # joint_idx: 48
+                    ],
+                )
+            },
+            noise=Unoise(n_min=-0.0025, n_max=0.0025),
         )
         motor_joint_vel = ObsTerm(
             func=mdp.joint_vel,
-            params={"asset_cfg": SceneEntityCfg("robot", joint_names=".*_motor")},
-            noise=Unoise(n_min=-0.05, n_max=0.05),
+            params={
+                "asset_cfg": SceneEntityCfg(
+                    "robot",
+                    joint_names=[
+                        "leg_left_1_motor",  # joint_idx: 4
+                        "leg_right_1_motor",  # joint_idx: 11
+                        "leg_left_2_motor",  # joint_idx: 18
+                        "leg_left_3_motor",  # joint_idx: 19
+                        "leg_right_2_motor",  # joint_idx: 36
+                        "leg_right_3_motor",  # joint_idx: 37
+                        "leg_left_4_motor",  # joint_idx: 38
+                        "leg_left_5_motor",  # joint_idx: 40
+                        "leg_left_length_motor",  # joint_idx: 43
+                        "leg_right_length_motor",  # joint_idx: 45
+                        "leg_right_4_motor",  # joint_idx: 46
+                        "leg_right_5_motor",  # joint_idx: 48
+                    ],
+                )
+            },
+            noise=Unoise(n_min=-0.025, n_max=0.025),
         )
         measured_joint_pos = ObsTerm(
             func=mdp.joint_pos,
@@ -207,16 +243,16 @@ class KangarooObservationsCfg:
                 "asset_cfg": SceneEntityCfg(
                     "robot",
                     joint_names=[
-                        "leg_left_1_joint",
-                        "leg_left_2_joint",
-                        "leg_left_3_joint",
-                        "left_ankle_4_pendulum_joint",
-                        "left_ankle_5_pendulum_joint",
-                        "leg_right_1_joint",
-                        "leg_right_2_joint",
-                        "leg_right_3_joint",
-                        "right_ankle_4_pendulum_joint",
-                        "right_ankle_5_pendulum_joint",
+                        "leg_left_1_joint",  # joint_idx: 1
+                        "leg_right_1_joint",  # joint_idx: 2
+                        "leg_left_2_joint",  # joint_idx: 7
+                        "leg_right_2_joint",  # joint_idx: 8
+                        "leg_left_3_joint",  # joint_idx: 14
+                        "leg_right_3_joint",  # joint_idx: 15
+                        "left_ankle_4_pendulum_joint",  # joint_idx: 21
+                        "left_ankle_5_pendulum_joint",  # joint_idx: 23
+                        "right_ankle_4_pendulum_joint",  # joint_idx: 30
+                        "right_ankle_5_pendulum_joint",  # joint_idx: 32
                     ],
                 )
             },
@@ -228,16 +264,16 @@ class KangarooObservationsCfg:
                 "asset_cfg": SceneEntityCfg(
                     "robot",
                     joint_names=[
-                        "leg_left_1_joint",
-                        "leg_left_2_joint",
-                        "leg_left_3_joint",
-                        "left_ankle_4_pendulum_joint",
-                        "left_ankle_5_pendulum_joint",
-                        "leg_right_1_joint",
-                        "leg_right_2_joint",
-                        "leg_right_3_joint",
-                        "right_ankle_4_pendulum_joint",
-                        "right_ankle_5_pendulum_joint",
+                        "leg_left_1_joint",  # joint_idx: 1
+                        "leg_right_1_joint",  # joint_idx: 2
+                        "leg_left_2_joint",  # joint_idx: 7
+                        "leg_right_2_joint",  # joint_idx: 8
+                        "leg_left_3_joint",  # joint_idx: 14
+                        "leg_right_3_joint",  # joint_idx: 15
+                        "left_ankle_4_pendulum_joint",  # joint_idx: 21
+                        "left_ankle_5_pendulum_joint",  # joint_idx: 23
+                        "right_ankle_4_pendulum_joint",  # joint_idx: 30
+                        "right_ankle_5_pendulum_joint",  # joint_idx: 32
                     ],
                 )
             },
@@ -394,18 +430,34 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         self.rewards.lin_vel_z_l2.weight = -0.2
         self.rewards.ang_vel_xy_l2.weight = -0.05
         self.rewards.action_rate_l2.weight = -0.005
-        # self.rewards.dof_acc_l2.weight = -1.25e-7
-        # self.rewards.dof_acc_l2.params["asset_cfg"] = SceneEntityCfg(
-        #     "robot", joint_names=[".*_hip_.*", ".*_knee_joint"]
+
+        self.rewards.dof_pos_limits = None
+        # self.rewards.dof_pos_limits.weight = -0.1
+        # self.rewards.dof_pos_limits.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot",
+        #     joint_names=[".*_motor"],
         # )
-        # self.rewards.dof_torques_l2.weight = -1.5e-7
-        # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
-        #     "robot", joint_names=[".*_hip_.*", ".*_knee_joint", ".*_ankle_.*"]
-        # )
-        self.rewards.dof_acc_l2 = None
-        self.rewards.dof_torques_l2 = None
+
         self.rewards.flat_orientation_l2 = None
-        self.rewards.undesired_contacts = None
+
+        self.rewards.dof_acc_l2 = None
+        # self.rewards.dof_acc_l2.weight = -1e-9
+        # self.rewards.dof_acc_l2.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot", joint_names=[".*"]
+        # )
+
+        self.rewards.dof_torques_l2 = None
+        # self.rewards.dof_torques_l2.weight = -1e-9
+        # self.rewards.dof_torques_l2.params["asset_cfg"] = SceneEntityCfg(
+        #     "robot", joint_names=[".*"]
+        # )
+
+        # self.rewards.undesired_contacts = None
+        self.rewards.undesired_contacts.weight = -1.0
+        self.rewards.undesired_contacts.params["sensor_cfg"] = SceneEntityCfg(
+            "contact_forces", body_names=".*_ankle_roll"
+        )
+        self.rewards.undesired_contacts.params["threshold"] = 600.0
 
         # Commands
         self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
