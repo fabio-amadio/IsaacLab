@@ -47,7 +47,7 @@ from isaaclab_tasks.manager_based.locomotion.velocity.config.kangaroo.agents.rsl
     KangarooFlatPPORunnerCfg,
 )
 
-from isaaclab_assets import KANGAROO_CFG, KANGAROO_MINIMAL_CFG  # isort: skip
+from isaaclab_assets import KANGAROO_CFG, KANGAROO_MINIMAL_CFG, KANGAROO_FIXED_CFG  # isort: skip
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
@@ -65,7 +65,6 @@ def main():
     env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
 
     agent_cfg = KangarooFlatPPORunnerCfg()
-
     # create isaac environment
     env = ManagerBasedRLEnv(env_cfg)
     # wrap around environment for rsl-rl
@@ -116,13 +115,16 @@ def main():
     qdot_log = []
 
     # reset environment
+    env.reset()
+    robot = env.unwrapped.scene.articulations["robot"]
+    joint_pos, joint_vel = robot.data.default_joint_pos, robot.data.default_joint_vel
+    robot.write_joint_state_to_sim(joint_pos, joint_vel)
+    
     obs, _ = env.get_observations()
 
     # loaded_actions = np.load("scripts/custom/offline_raw_actions_list.npy")
     # loaded_actions = torch.tensor(loaded_actions, device=env.unwrapped.device)
     # print("loaded_actions", loaded_actions.shape)
-
-    robot = env.unwrapped.scene.articulations["robot"]
     motor_joint_idxs = [4, 11, 18, 19, 36, 37, 38, 40, 43, 45, 46, 48]
 
     
@@ -145,6 +147,7 @@ def main():
 
             # agent stepping
             actions = policy(obs)
+            # actions = torch.zeros_like(actions)
             # actions = loaded_actions[count, :]
 
             # log
@@ -152,6 +155,9 @@ def main():
 
             # env stepping
             obs, _, _, _ = env.step(actions)
+
+            print("root_lin_vel_b", robot.data.root_lin_vel_b)
+            print("root_ang_vel_b", robot.data.root_ang_vel_b)
 
             q_log.append(robot.data.joint_pos.cpu().detach().numpy())
             qdot_log.append(robot.data.joint_vel.cpu().detach().numpy())

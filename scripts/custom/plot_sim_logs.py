@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 # Load the numpy array from file
 q_log = np.load("q_log.npy")
 a_log = np.load("a_log.npy")
+left_contact_forces = np.load("left_contact_forces.npy")
+right_contact_forces = np.load("right_contact_forces.npy")
+left_step_height = np.load("left_step_height.npy")
+right_step_height = np.load("right_step_height.npy")
 # a_log = np.load("proc_actions_list.npy")
 # observations = np.load("observations_list.npy")
 
@@ -44,7 +48,7 @@ meas_joint_names = [
     "right_ankle_5_pendulum_joint",  # joint_idx: 32
 ]
 
-"""Check actions"""
+# """Check actions"""
 
 # Plot the data
 for i in action_idxs:
@@ -57,6 +61,55 @@ for i in action_idxs:
     plt.legend()
     plt.grid()
     plt.show()
+
+
+"""Check contact forces"""
+# Plot the left contact forces (x, y, z components)
+plt.figure(figsize=(10, 5))
+plt.plot(left_contact_forces[:, 0], label="Left Contact Force - X")
+plt.plot(left_contact_forces[:, 1], label="Left Contact Force - Y")
+plt.plot(left_contact_forces[:, 2], label="Left Contact Force - Z")
+plt.title("Left Contact Forces")
+plt.xlabel("steps")
+plt.ylabel("force [N]")
+plt.legend()
+plt.grid()
+plt.show()
+
+# Plot the right contact forces (x, y, z components)
+plt.figure(figsize=(10, 5))
+plt.plot(right_contact_forces[:, 0], label="Right Contact Force - X")
+plt.plot(right_contact_forces[:, 1], label="Right Contact Force - Y")
+plt.plot(right_contact_forces[:, 2], label="Right Contact Force - Z")
+plt.title("Right Contact Forces")
+plt.xlabel("steps")
+plt.ylabel("force [N]")
+plt.legend()
+plt.grid()
+plt.show()
+
+"""Check step height"""
+# Plot the left step height
+plt.figure(figsize=(10, 5))
+plt.plot(left_step_height, label="Left Step Height")
+plt.title("Left Step Height")
+plt.xlabel("steps")
+plt.ylabel("height [m]")
+plt.legend()
+plt.grid()
+plt.show()
+# Plot the right step height
+plt.figure(figsize=(10, 5))
+plt.plot(right_step_height, label="Right Step Height")
+plt.title("Right Step Height")
+plt.xlabel("steps")
+plt.ylabel("height [m]")
+plt.legend()
+plt.grid()
+plt.show()
+
+print("left_step_height", left_step_height[0])
+print("right_step_height", right_step_height[0])
 
 
 """Check observations"""

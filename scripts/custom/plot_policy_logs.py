@@ -41,35 +41,34 @@ meas_joint_names = [
     "right_ankle_5_pendulum_joint",  # joint_idx: 32
 ]
 
+# Plot the joint ref - true values
+for i in range(len(motor_joint_idxs)):
+    plt.figure(figsize=(10, 5))
+    plt.plot(q_log[:, :, motor_joint_idxs[i]], label="true")
+    plt.plot(proc_actions[:, :, i], label="ref")
+    plt.title(motor_joint_names[i])
+    plt.xlabel("steps")
+    plt.ylabel("position [m]")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
-# # Plot the joint ref - true values
-# for i in range(len(motor_joint_idxs)):
-#     plt.figure(figsize=(10, 5))
-#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="true", marker='o')
-#     plt.plot(proc_actions[:, :, i], label="ref", marker='o')
-#     plt.title(motor_joint_names[i])
-#     plt.xlabel("steps")
-#     plt.ylabel("position [m]")
-#     plt.legend()
-#     plt.grid()
-#     plt.show()
-
-# # Plot the motor joint positions
-# for i in range(len(motor_joint_idxs)):
-#     plt.figure(figsize=(10, 5))
-#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="q", marker='o')
-#     plt.plot(observations[:, :, 12 + i], label="obs", marker='o')
-#     plt.title(motor_joint_names[i])
-#     plt.xlabel("steps")
-#     plt.ylabel("position [m]")
-#     plt.legend()
-#     plt.grid()
-#     plt.show()
+# Plot the motor joint positions
+for i in range(len(motor_joint_idxs)):
+    plt.figure(figsize=(10, 5))
+    plt.plot(q_log[:, :, motor_joint_idxs[i]], label="q")
+    plt.plot(observations[:, :, 12 + i], label="obs")
+    plt.title(motor_joint_names[i])
+    plt.xlabel("steps")
+    plt.ylabel("position [m]")
+    plt.legend()
+    plt.grid()
+    plt.show()
 
 # # Plot the qdot
 # for i in range(12):
 #     plt.figure(figsize=(10, 5))
-#     plt.plot(qdot_log[:, :, motor_joint_idxs[i]], label="qdot", linestyle='-', marker='o')
+#     plt.plot(qdot_log[:, :, motor_joint_idxs[i]], label="qdot", linestyle='-')
 #     plt.title(motor_joint_names[i])
 #     plt.xlabel("steps")
 #     plt.ylabel("velocity [m/s]")
@@ -80,8 +79,8 @@ meas_joint_names = [
 # # Plot the measured joint positions
 # for i in range(len(meas_joint_idxs)):
 #     plt.figure(figsize=(10, 5))
-#     plt.plot(q_log[:, :, meas_joint_idxs[i]], label="q", marker='o')
-#     plt.plot(observations[:, :, 36 + i], label="obs", marker='o')
+#     plt.plot(q_log[:, :, meas_joint_idxs[i]], label="q")
+#     plt.plot(observations[:, :, 36 + i], label="obs")
 #     plt.title(meas_joint_names[i])
 #     plt.xlabel("steps")
 #     plt.ylabel("position [m]")
@@ -92,9 +91,10 @@ meas_joint_names = [
 # # Plot the raw actions
 # for i in range(12):
 #     plt.figure(figsize=(10, 5))
-#     plt.plot(raw_actions[:, :, i], label="act", marker='o')
-#     plt.plot(observations[:, :, -12 + i], label="obs", marker='o')
-#     plt.title(f"Raw action {i}")
+#     plt.plot(raw_actions[:, :, i], label="raw")
+#     plt.plot(proc_actions[:, :, i], label="proc")
+#     plt.plot(observations[:, :, -12 + i], label="past act in obs")
+#     plt.title(f"Action {i}")
 #     plt.xlabel("steps")
 #     plt.ylabel("position [m]")
 #     plt.legend()

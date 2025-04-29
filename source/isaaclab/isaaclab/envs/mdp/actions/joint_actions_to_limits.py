@@ -122,10 +122,11 @@ class JointPositionToLimitsAction(ActionTerm):
         # this is useful when the input actions are in the range [-1, 1]
         if self.cfg.rescale_to_limits:
             # clip to [-1, 1]
+            offset = torch.tensor(self.cfg.clamp_offset, device=self.device)
             if not self.cfg.use_tanh:
-                actions = self._processed_actions.clamp(-1.0, 1.0)
+                actions = (self._processed_actions + offset).clamp(-1.0, 1.0)
             else: 
-                actions = torch.tanh(self._processed_actions)
+                actions = torch.tanh(self._processed_actions + offset)
             # rescale within the joint limits
             actions = math_utils.unscale_transform(
                 actions,

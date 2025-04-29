@@ -127,6 +127,8 @@ class JointPositionToLimitsActionCfg(ActionTermCfg):
     use_tanh: bool = False
     """Whether to use tanh to scale the actions in the range [-1, 1]. Defaults to False."""
 
+    clamp_offset: float | list[float] = 0.0
+
 
 @configclass
 class EMAJointPositionToLimitsActionCfg(JointPositionToLimitsActionCfg):

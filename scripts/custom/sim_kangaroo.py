@@ -48,126 +48,11 @@ import isaaclab.sim as sim_utils
 from isaaclab.actuators import ImplicitActuatorCfg
 from isaaclab.assets import ArticulationCfg
 from isaaclab_assets import ISAACLAB_ASSETS_DATA_DIR
-
-
-KANGAROO_FIXED_CFG = ArticulationCfg(
-    spawn=sim_utils.UsdFileCfg(
-        usd_path=f"{ISAACLAB_ASSETS_DATA_DIR}/Robots/PAL/Kangaroo/kangaroo.usd",
-        activate_contact_sensors=True,
-        rigid_props=sim_utils.RigidBodyPropertiesCfg(
-            disable_gravity=True,
-            retain_accelerations=False,
-            linear_damping=0.0,
-            angular_damping=0.0,
-            max_linear_velocity=1000.0,
-            max_angular_velocity=1000.0,
-            max_depenetration_velocity=1.0,
-        ),
-        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
-            enabled_self_collisions=False,
-            solver_position_iteration_count=8,
-            solver_velocity_iteration_count=4,
-            fix_root_link=True,
-        ),
-    ),
-    init_state=ArticulationCfg.InitialStateCfg(
-        pos=(0.0, 0.0, 1.05),
-        joint_pos={
-            "leg_left_.*": 0.0,
-            "leg_right_.*": 0.0,
-        },
-        joint_vel={".*": 0.0},
-    ),
-    soft_joint_pos_limit_factor=0.9,
-    actuators={
-        "motor": ImplicitActuatorCfg(
-            joint_names_expr=[
-                "leg_left_1_motor",
-                "leg_right_1_motor",
-                "leg_left_2_motor",
-                "leg_left_3_motor",
-                "leg_right_2_motor",
-                "leg_right_3_motor",
-                "leg_left_4_motor",
-                "leg_left_5_motor",
-                "leg_left_length_motor",
-                "leg_right_length_motor",
-                "leg_right_4_motor",
-                "leg_right_5_motor",
-            ],
-            effort_limit={
-                "leg_left_1_motor": 3000,  # 2000,
-                "leg_right_1_motor": 3000,  # 2000,
-                "leg_left_2_motor": 3000,
-                "leg_right_2_motor": 3000,
-                "leg_left_3_motor": 3000,
-                "leg_right_3_motor": 3000,
-                "leg_left_4_motor": 3000,
-                "leg_right_4_motor": 3000,
-                "leg_left_5_motor": 3000,
-                "leg_right_5_motor": 3000,
-                "leg_left_length_motor": 5000,
-                "leg_right_length_motor": 5000,
-            },
-            velocity_limit={
-                "leg_left_1_motor": 0.4,
-                "leg_right_1_motor": 0.4,
-                "leg_left_2_motor": 0.4,
-                "leg_right_2_motor": 0.4,
-                "leg_left_3_motor": 0.4,
-                "leg_right_3_motor": 0.4,
-                "leg_left_4_motor": 0.4,
-                "leg_right_4_motor": 0.4,
-                "leg_left_5_motor": 0.4,
-                "leg_right_5_motor": 0.4,
-                "leg_left_length_motor": 0.625,
-                "leg_right_length_motor": 0.625,
-            },
-            stiffness={
-                "leg_left_1_motor":         200000.0,
-                "leg_right_1_motor":        200000.0,
-                "leg_left_2_motor":         200000.0,
-                "leg_right_2_motor":        200000.0,
-                "leg_left_3_motor":         200000.0,
-                "leg_right_3_motor":        200000.0,
-                "leg_left_4_motor":         500000.0,
-                "leg_right_4_motor":        500000.0,
-                "leg_left_5_motor":         500000.0,
-                "leg_right_5_motor":        500000.0,
-                "leg_left_length_motor":    500000.0,
-                "leg_right_length_motor":   500000.0,
-            },
-            damping={
-                "leg_left_1_motor":         1500.0,
-                "leg_right_1_motor":        1500.0,
-                "leg_left_2_motor":         1500.0,
-                "leg_right_2_motor":        1500.0,
-                "leg_left_3_motor":         1500.0,
-                "leg_right_3_motor":        1500.0,
-                "leg_left_4_motor":         2500.0,
-                "leg_right_4_motor":        2500.0,
-                "leg_left_5_motor":         2500.0,
-                "leg_right_5_motor":        2500.0,
-                "leg_left_length_motor":    2500.0,
-                "leg_right_length_motor":   2500.0,
-            },
-            armature={
-                "leg_left_1_motor": 0.01,
-                "leg_right_1_motor": 0.01,
-                "leg_left_2_motor": 0.01,
-                "leg_right_2_motor": 0.01,
-                "leg_left_3_motor": 0.01,
-                "leg_right_3_motor": 0.01,
-                "leg_left_4_motor": 0.01,
-                "leg_right_4_motor": 0.01,
-                "leg_left_5_motor": 0.01,
-                "leg_right_5_motor": 0.01,
-                "leg_left_length_motor": 0.01,
-                "leg_right_length_motor": 0.01,
-            },
-        ),
-    },
-)
+from isaaclab_assets import (
+    KANGAROO_CFG,
+    KANGAROO_MINIMAL_CFG,
+    KANGAROO_FIXED_CFG,
+)  # isort: skip
 
 
 def main():
@@ -175,8 +60,8 @@ def main():
     # create environment configuration
     env_cfg = KangarooFlatEnvCfg_PLAY()
     env_cfg.scene.num_envs = 1
-    env_cfg.episode_length_s = 5.0
-    env_cfg.scene.robot = KANGAROO_FIXED_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    env_cfg.episode_length_s = 1.0
+    env_cfg.scene.robot = KANGAROO_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
     env_cfg.actions.joint_pos = mdp.JointPositionActionCfg(
         asset_name="robot",
         joint_names=[".*_motor"],
@@ -184,8 +69,7 @@ def main():
         use_default_offset=False,
     )
 
-    init_state = env_cfg.scene.robot.init_state
-    # print(env.scene.articulations["robot"].data.default_joint_pos[0,:])
+    # init_state = env_cfg.scene.robot.init_state
 
     # create isaac environment
     env = ManagerBasedRLEnv(cfg=env_cfg)
@@ -193,10 +77,23 @@ def main():
     actuated_joint_limits = robot.data.default_joint_pos_limits[
         :, robot.actuators["motor"].joint_indices, :
     ]
-    print("actuators joints names\n", robot.actuators["motor"].joint_names)
-    print("actuators joints indices\n", robot.actuators["motor"].joint_indices)
-    print("actuated_joint_limits\n", actuated_joint_limits)
+    # print("actuators joints names\n", robot.actuators["motor"].joint_names)
+    # print("actuators joints indices\n", robot.actuators["motor"].joint_indices)
+    # print("actuated_joint_limits\n", actuated_joint_limits)
+
+    print(
+        "default_joint_pos",
+        robot.data.default_joint_pos[:, robot.actuators["motor"].joint_indices],
+    )
+    print("joint_pos", robot.data.joint_pos[:, robot.actuators["motor"].joint_indices])
     env.reset()
+    # # reset dof state
+    # print("##########################################################################")
+    # print(len(robot.data.joint_names))
+    # print(robot.data.joint_names)
+    # print("##########################################################################")
+    joint_pos, joint_vel = robot.data.default_joint_pos, robot.data.default_joint_vel
+    robot.write_joint_state_to_sim(joint_pos, joint_vel)
 
     # dump the list of robot.joint_names into a CSV file
     with open("joint_names.csv", mode="w", newline="") as file:
@@ -206,20 +103,28 @@ def main():
     # initialize action variables
     actions = torch.zeros_like(env.action_manager.action)
     for i, q in enumerate(
-        env.scene.articulations["robot"].data.joint_pos[
+        env.scene.articulations["robot"].data.default_joint_pos[
             0, robot.actuators["motor"].joint_indices
         ]
     ):
         actions[0, i] = q
     print("actions", actions)
     a_idx = 8  # pick between 0 and 11
-    a_step = 0.001
+    a_step = 0.0
     a_step_dir = 1
 
     # init log lists
     a_log = []
     q_log = []
     qdot_log = []
+    left_contact_forces = []
+    right_contact_forces = []
+    left_step_height = []
+    right_step_height = []
+
+    contact_sensor = env.unwrapped.scene.sensors["contact_forces"]
+    left_foot_idx = contact_sensor.body_names.index("left_ankle_roll")
+    right_foot_idx = contact_sensor.body_names.index("right_ankle_roll")
 
     count = 0
     max_steps = env_cfg.episode_length_s / (env_cfg.sim.dt * env_cfg.decimation)
@@ -273,6 +178,40 @@ def main():
             #     robot.data.default_joint_pos_limits,
             # )
 
+            left_contact_forces.append(
+                contact_sensor.data.net_forces_w[:, left_foot_idx, :][:, :]
+                .cpu()
+                .detach()
+                .numpy()
+                .squeeze()
+            )
+
+            right_contact_forces.append(
+                contact_sensor.data.net_forces_w[:, right_foot_idx, :][:, :]
+                .cpu()
+                .detach()
+                .numpy()
+                .squeeze()
+            )
+
+            left_step_height.append(
+                robot.data.body_link_pos_w[
+                    :, robot.body_names.index("left_ankle_roll"), :
+                ][:, 2]
+                .cpu()
+                .detach()
+                .numpy()
+            )
+            right_step_height.append(
+                robot.data.body_link_pos_w[
+                    :, robot.body_names.index("right_ankle_roll"), :
+                ][:, 2]
+                .cpu()
+                .detach()
+                .numpy()
+            )
+
+
             # env stepping
             obs, rew, terminated, truncated, info = env.step(actions)
 
@@ -285,10 +224,24 @@ def main():
     a_log = np.array(a_log)
     q_log = np.array(q_log)
     qdot_log = np.array(qdot_log)
+    left_contact_forces = np.array(left_contact_forces)
+    right_contact_forces = np.array(right_contact_forces)
+    left_step_height = np.array(left_step_height)
+    right_step_height = np.array(right_step_height)
     # save the logs
     np.save("a_log.npy", a_log)
     np.save("q_log.npy", q_log)
     np.save("qdot_log.npy", qdot_log)
+    np.save("left_contact_forces.npy", left_contact_forces)
+    np.save("left_step_height.npy", left_step_height)
+    np.save("right_step_height.npy", right_step_height)
+
+    # Create a dictionary with joint names as keys and their positions as values
+    joint_positions = {
+        name: pos.item()
+        for name, pos in zip(robot.joint_names, robot.data.joint_pos[0])
+    }
+    print("Joint Positions Dictionary:\n", joint_positions)
 
 
 if __name__ == "__main__":
