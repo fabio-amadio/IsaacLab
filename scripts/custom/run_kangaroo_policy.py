@@ -57,7 +57,7 @@ def main():
     """Main function."""
     # create environment configuration
     env_cfg = KangarooFlatEnvCfg()
-    # env_cfg.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    env_cfg.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
     env_cfg.scene.num_envs = args_cli.num_envs
 
     env_cfg.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)

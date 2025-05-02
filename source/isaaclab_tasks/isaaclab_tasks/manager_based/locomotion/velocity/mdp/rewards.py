@@ -46,7 +46,7 @@ def feet_air_time(
     reward = torch.sum((last_air_time - threshold) * first_contact, dim=1)
     # no reward for zero command
     reward *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return reward
 
@@ -74,7 +74,7 @@ def feet_air_time_positive_biped(
     reward = torch.clamp(reward, max=threshold)
     # no reward for zero command
     reward *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return reward
 
@@ -145,7 +145,7 @@ def track_ang_vel_z_world_exp(
 def both_feet_in_air(
     env, command_name: str, sensor_cfg: SceneEntityCfg
 ) -> torch.Tensor:
-    """Reward keeping both feet in contact when not moving."""
+    """Penalty for having both feet in the air."""
     contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
     # compute the penalty
     contact_time = contact_sensor.data.current_contact_time[:, sensor_cfg.body_ids]
@@ -163,11 +163,11 @@ def both_feet_in_contact(
     contact_time = contact_sensor.data.current_contact_time[:, sensor_cfg.body_ids]
     in_contact = contact_time > 0.0
     both_feet_in_contact = torch.sum(in_contact.int(), dim=1) == 2
-    # no penalty for zero command
-    penalty = both_feet_in_contact * (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.1
+    # reward only for zero command
+    reward = both_feet_in_contact * (
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) < 0.05
     )
-    return penalty
+    return reward
 
 
 def contact_time(
@@ -193,7 +193,7 @@ def contact_time(
     reward = torch.sum((last_contact_time - threshold) * ~first_contact, dim=1)
     # no reward for zero command
     reward *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return reward
 
@@ -217,7 +217,7 @@ def different_step_times(
     )
     # no penalty for zero command
     penalty *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return penalty
 
@@ -240,7 +240,7 @@ def different_air_contact_times(
     penalty = torch.sum(air_contact_time_abs_diff, dim=1)
     # no penalty for zero command
     penalty *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return penalty
 
@@ -268,6 +268,6 @@ def feet_swing_height(
     penalty = torch.sum(torch.abs(body_height - target_height) * ~contacts, dim=1)
     # no penalty for zero command
     penalty *= (
-        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.1
+        torch.norm(env.command_manager.get_command(command_name)[:, :2], dim=1) > 0.05
     )
     return penalty

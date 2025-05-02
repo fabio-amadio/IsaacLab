@@ -5,6 +5,7 @@
 
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
@@ -45,32 +46,13 @@ class KangarooRewards(RewardsCfg):
 
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
-        weight=3.0,
+        weight=1.0,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-            "threshold": 0.6,  # TODO: try 0.1~0.2
+            "threshold": 0.4,
         },
     )
-
-    # feet_air_time = RewTerm(
-    #     func=mdp.feet_air_time,
-    #     weight=2.0
-    #     params={
-    #         "command_name": "base_velocity",
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-    #         "threshold": 0.4,
-    #     },
-    # )
-
-    # both_feet_in_contact = RewTerm(
-    #     func=mdp.both_feet_in_contact,
-    #     weight=0.25,
-    #     params={
-    #         "command_name": "base_velocity",
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-    #     },
-    # )
 
     feet_slide = RewTerm(
         func=mdp.feet_slide,
@@ -80,6 +62,35 @@ class KangarooRewards(RewardsCfg):
             "asset_cfg": SceneEntityCfg("robot", body_names=".*_ankle_roll"),
         },
     )
+
+    # Penalize uneven step times between the two feets
+    different_step_times = RewTerm(
+        func=mdp.different_step_times,
+        weight=-0.5,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+        },
+    )
+
+    # Penalize too different feet air and contact times
+    different_air_contact_times = RewTerm(
+        func=mdp.different_air_contact_times,
+        weight=-0.5,
+        params={
+            "command_name": "base_velocity",
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+        },
+    )
+
+    # both_feet_in_contact = RewTerm(
+    #     func=mdp.both_feet_in_contact,
+    #     weight=0.25,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #     },
+    # )
 
     # # Penalize motor joint limits
     # dof_pos_limits = RewTerm(
@@ -132,34 +143,13 @@ class KangarooRewards(RewardsCfg):
     #     },
     # )
 
-    # Penalize uneven step times between the two feets
-    different_step_times = RewTerm(
-        func=mdp.different_step_times,
-        weight=-0.5,  # TODO: try 1.0
-          
-        params={
-            "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-        },
-    )
-
-    # Penalize too different feet air and contact times
-    different_air_contact_times = RewTerm(
-        func=mdp.different_air_contact_times,
-        weight=-0.5,
-        params={
-            "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-        },
-    )
-
-    # # Penalize small swing feet height
+    # # Penalize distance from a target swing feet height
     # feet_swing_height = RewTerm(
     #     func=mdp.feet_swing_height,
     #     weight=-1.0,
     #     params={
     #         "command_name": "base_velocity",
-    #         "target_height": 0.10,
+    #         "target_height": 0.15,
     #         "sensor_cfg": SceneEntityCfg(
     #             "contact_forces", body_names=".*_ankle_roll", preserve_order=True
     #         ),
@@ -330,21 +320,21 @@ class KangarooEventCfg:
     #     mode="startup",
     #     params={
     #         "asset_cfg": SceneEntityCfg("robot", body_names="torso"),
-    #         "mass_distribution_params": (0.0, 4.0),
+    #         "mass_distribution_params": (0.0, 3.0),
     #         "operation": "add",
     #     },
     # )
 
     # reset
-    base_external_force_torque = EventTerm(
-        func=mdp.apply_external_force_torque,
-        mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", body_names="torso"),
-            "force_range": (0.0, 0.0),
-            "torque_range": (-0.0, 0.0),
-        },
-    )
+    # base_external_force_torque = EventTerm(
+    #     func=mdp.apply_external_force_torque,
+    #     mode="reset",
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names="torso"),
+    #         "force_range": (0.0, 0.0),
+    #         "torque_range": (-0.0, 0.0),
+    #     },
+    # )
     reset_base = EventTerm(
         func=mdp.reset_root_state_uniform,
         mode="reset",
@@ -360,23 +350,47 @@ class KangarooEventCfg:
             },
         },
     )
-    # reset_robot_joints = EventTerm(
+    # reset_motor_joints = EventTerm(
     #     func=mdp.reset_joints_by_offset,
     #     mode="reset",
     #     params={
-    #         "position_range": (0.01, 0.01),
-    #         "velocity_range": (0.01, 0.01),
+    #         "position_range": (-0.005, 0.005),
+    #         "velocity_range": (0.0, 0.0),
+    #         "asset_cfg": SceneEntityCfg(
+    #             "robot",
+    #             joint_names=[
+    #                 "leg_left_1_motor",
+    #                 "leg_right_1_motor",
+    #                 "leg_left_2_motor",
+    #                 "leg_left_3_motor",
+    #                 "leg_right_2_motor",
+    #                 "leg_right_3_motor",
+    #                 "leg_left_4_motor",
+    #                 "leg_left_5_motor",
+    #                 "leg_left_length_motor",
+    #                 "leg_right_length_motor",
+    #                 "leg_right_4_motor",
+    #                 "leg_right_5_motor",
+    #             ],
+    #         ),
     #     },
-    # )  # TODO: separate prismatic and revolute joints
+    # )
 
-    # interval
+    # # interval
     # push_robot = EventTerm(
     #     func=mdp.push_by_setting_velocity,
     #     mode="interval",
     #     interval_range_s=(10.0, 15.0),
-    #     params={"velocity_range": {"x": (-0.75, 0.75), "y": (-0.75, 0.75)}},
+    #     params={
+    #         "velocity_range": {
+    #             "x": (-0.5, 0.5),
+    #             "y": (-0.5, 0.5),
+    #             "yaw": (-0.5, 0.5),
+    #             "pitch": (-0.05, 0.05),
+    #             "roll": (-0.05, 0.05),
+    #         }
+    #     },
     # )
-
 
 
 @configclass
@@ -391,12 +405,40 @@ class KangarooTerminationsCfg:
 
 
 @configclass
+class KangarooCurriculumCfg:
+    """Curriculum terms for the MDP."""
+
+    terrain_levels = CurrTerm(func=mdp.terrain_levels_vel)
+    # adjust_feer_air_time_weight = CurrTerm(
+    #     func=mdp.adjust_feer_air_time_weight,
+    #     params={
+    #         "term_name": "feet_air_time",
+    #         "weight": 1.0,
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #         "time_threshold": 0.6,
+    #         "rew_threshold": 0.1,
+    #     },
+    # )
+    # adjust_feer_air_time_weight = CurrTerm(
+    #     func=mdp.adjust_feer_air_time_weight_alt,
+    #     params={
+    #         "term_name": "feet_air_time",
+    #         "weight": 1.0,
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #         "threshold": 0.1,
+    #     },
+    # )
+
+
+@configclass
 class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: KangarooRewards = KangarooRewards()
     actions: KangarooActionsCfg = KangarooActionsCfg()
     observations: KangarooObservationsCfg = KangarooObservationsCfg()
     terminations: KangarooTerminationsCfg = KangarooTerminationsCfg()
     events: KangarooEventCfg = KangarooEventCfg()
+    curriculum: KangarooCurriculumCfg = KangarooCurriculumCfg()
 
     def __post_init__(self):
         # post init of parent
@@ -429,7 +471,7 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         # Rewards
         self.rewards.lin_vel_z_l2.weight = -0.2
         self.rewards.ang_vel_xy_l2.weight = -0.05
-        self.rewards.action_rate_l2.weight = -0.005
+        self.rewards.action_rate_l2.weight = -0.01
 
         self.rewards.dof_pos_limits = None
         # self.rewards.dof_pos_limits.weight = -0.1
@@ -438,8 +480,8 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         #     joint_names=[".*_motor"],
         # )
 
-        self.rewards.flat_orientation_l2 = None
-        # self.rewards.flat_orientation_l2.weight = -1.0
+        # self.rewards.flat_orientation_l2 = None
+        self.rewards.flat_orientation_l2.weight = -2.0
 
         self.rewards.dof_acc_l2 = None
         # self.rewards.dof_acc_l2.weight = -1e-9

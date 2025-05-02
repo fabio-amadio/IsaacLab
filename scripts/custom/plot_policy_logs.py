@@ -41,29 +41,29 @@ meas_joint_names = [
     "right_ankle_5_pendulum_joint",  # joint_idx: 32
 ]
 
-# Plot the joint ref - true values
-for i in range(len(motor_joint_idxs)):
-    plt.figure(figsize=(10, 5))
-    plt.plot(q_log[:, :, motor_joint_idxs[i]], label="true")
-    plt.plot(proc_actions[:, :, i], label="ref")
-    plt.title(motor_joint_names[i])
-    plt.xlabel("steps")
-    plt.ylabel("position [m]")
-    plt.legend()
-    plt.grid()
-    plt.show()
+# # Plot the joint ref - true values
+# for i in range(len(motor_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="true")
+#     plt.plot(proc_actions[:, :, i], label="ref")
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
 
-# Plot the motor joint positions
-for i in range(len(motor_joint_idxs)):
-    plt.figure(figsize=(10, 5))
-    plt.plot(q_log[:, :, motor_joint_idxs[i]], label="q")
-    plt.plot(observations[:, :, 12 + i], label="obs")
-    plt.title(motor_joint_names[i])
-    plt.xlabel("steps")
-    plt.ylabel("position [m]")
-    plt.legend()
-    plt.grid()
-    plt.show()
+# # Plot the motor joint positions
+# for i in range(len(motor_joint_idxs)):
+#     plt.figure(figsize=(10, 5))
+#     plt.plot(q_log[:, :, motor_joint_idxs[i]], label="q")
+#     plt.plot(observations[:, :, 12 + i], label="obs")
+#     plt.title(motor_joint_names[i])
+#     plt.xlabel("steps")
+#     plt.ylabel("position [m]")
+#     plt.legend()
+#     plt.grid()
+#     plt.show()
 
 # # Plot the qdot
 # for i in range(12):
