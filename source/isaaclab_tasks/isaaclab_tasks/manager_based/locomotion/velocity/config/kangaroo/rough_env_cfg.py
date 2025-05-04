@@ -46,7 +46,7 @@ class KangarooRewards(RewardsCfg):
 
     feet_air_time = RewTerm(
         func=mdp.feet_air_time_positive_biped,
-        weight=1.0,
+        weight=2.0,
         params={
             "command_name": "base_velocity",
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
@@ -73,15 +73,15 @@ class KangarooRewards(RewardsCfg):
         },
     )
 
-    # Penalize too different feet air and contact times
-    different_air_contact_times = RewTerm(
-        func=mdp.different_air_contact_times,
-        weight=-0.5,
-        params={
-            "command_name": "base_velocity",
-            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
-        },
-    )
+    # # Penalize too different feet air and contact times
+    # different_air_contact_times = RewTerm(
+    #     func=mdp.different_air_contact_times,
+    #     weight=-0.5,
+    #     params={
+    #         "command_name": "base_velocity",
+    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*_ankle_roll"),
+    #     },
+    # )
 
     # both_feet_in_contact = RewTerm(
     #     func=mdp.both_feet_in_contact,
@@ -445,7 +445,7 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
         super().__post_init__()
         # Scene
         self.scene.num_envs = 2048
-        self.scene.robot = KANGAROO_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso"
         self.scene.terrain.terrain_generator = SIMPLE_ROUGH_TERRAINS_CFG
 
