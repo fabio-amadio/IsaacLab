@@ -64,6 +64,11 @@ def main():
     env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
     env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
 
+    env_cfg.events.reset_base = None
+    env_cfg.events.physics_material = None
+
+    env_cfg.commands.base_velocity.debug_vis = False
+
     agent_cfg = KangarooFlatPPORunnerCfg()
     # create isaac environment
     env = ManagerBasedRLEnv(env_cfg)
