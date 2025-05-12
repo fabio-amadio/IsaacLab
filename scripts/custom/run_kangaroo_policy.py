@@ -47,7 +47,11 @@ from isaaclab_tasks.manager_based.locomotion.velocity.config.kangaroo.agents.rsl
     KangarooFlatPPORunnerCfg,
 )
 
-from isaaclab_assets import KANGAROO_CFG, KANGAROO_MINIMAL_CFG, KANGAROO_FIXED_CFG  # isort: skip
+from isaaclab_assets import (
+    KANGAROO_CFG,
+    KANGAROO_MINIMAL_CFG,
+    KANGAROO_FIXED_CFG,
+)  # isort: skip
 import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_rl.rsl_rl import RslRlVecEnvWrapper
@@ -64,7 +68,18 @@ def main():
     env_cfg.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
     env_cfg.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
 
-    env_cfg.events.reset_base = None
+    env_cfg.events.reset_base.params = {
+        "pose_range": {"x": (0, 0), "y": (0, 0), "yaw": (3.14, 3.14)},
+        "velocity_range": {
+            "x": (-0, 0),
+            "y": (-0, 0),
+            "z": (-0, 0),
+            "roll": (-0, 0),
+            "pitch": (-0, 0),
+            "yaw": (-0, 0),
+        },
+    }
+
     env_cfg.events.physics_material = None
 
     env_cfg.commands.base_velocity.debug_vis = False
@@ -124,7 +139,7 @@ def main():
     robot = env.unwrapped.scene.articulations["robot"]
     joint_pos, joint_vel = robot.data.default_joint_pos, robot.data.default_joint_vel
     robot.write_joint_state_to_sim(joint_pos, joint_vel)
-    
+
     obs, _ = env.get_observations()
 
     # loaded_actions = np.load("scripts/custom/offline_raw_actions_list.npy")
@@ -132,7 +147,6 @@ def main():
     # print("loaded_actions", loaded_actions.shape)
     motor_joint_idxs = [4, 11, 18, 19, 36, 37, 38, 40, 43, 45, 46, 48]
 
-    
     actuated_joint_limits = robot.data.default_joint_pos_limits[
         :, robot.actuators["motor"].joint_indices, :
     ]

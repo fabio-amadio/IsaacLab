@@ -10,6 +10,7 @@
 import argparse
 import os
 import numpy as np
+import csv
 
 from rsl_rl.runners import OnPolicyRunner
 
@@ -72,7 +73,8 @@ def main():
     log_root_path = os.path.abspath(log_root_path)
     print(f"[INFO] Loading experiment from directory: {log_root_path}")
 
-    run_name = f"obs_w_motor_and_measured_joints_seed_{args_cli.run_seed}"
+    # run_name = f"obs_w_motor_and_measured_joints_seed_{args_cli.run_seed}"
+    run_name = f"low_action_rate_weight_seed_{args_cli.run_seed}"
     resume_path = os.path.join(log_root_path, run_name, "model_1999.pt")
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
 
@@ -92,12 +94,20 @@ def main():
     base_height = []
 
     proc_actions_list = []
+    raw_actions_list = []
     q_log = []
     qdot_log = []
 
     # reset environment
     env.reset()
     robot = env.unwrapped.scene.articulations["robot"]
+
+    # dump the list of robot.joint_names into a CSV file
+    with open(
+        os.path.join(log_root_path, run_name, "joint_names.csv"), mode="w", newline=""
+    ) as file:
+        writer = csv.writer(file)
+        writer.writerows([[name] for name in robot.joint_names])
 
     joint_pos, joint_vel = robot.data.default_joint_pos, robot.data.default_joint_vel
     robot.write_joint_state_to_sim(joint_pos, joint_vel)
@@ -113,6 +123,7 @@ def main():
 
             # agent stepping
             actions = policy(obs)
+            raw_actions_list.append(actions.cpu().detach().numpy())
 
             # env stepping
             obs, _, _, _ = env.step(actions)
@@ -125,7 +136,9 @@ def main():
             # print("ref_ang_vel_b", ref_ang_vel_b.shape)
             # print("robot.data.root_ang_vel_b", robot.data.root_ang_vel_b[:, 2:3].cpu().detach().numpy().shape)
 
-            ang_err = ref_ang_vel_b - robot.data.root_ang_vel_b[:, 2:3].cpu().detach().numpy()
+            ang_err = (
+                ref_ang_vel_b - robot.data.root_ang_vel_b[:, 2:3].cpu().detach().numpy()
+            )
             # print("ang_err", ang_err.shape)
             # print("abs(ang_err)", np.abs(ang_err).shape)
 
@@ -136,9 +149,7 @@ def main():
                     axis=1,
                 )
             )
-            ang_track_err.append(
-                np.abs(ang_err).squeeze()
-            )
+            ang_track_err.append(np.abs(ang_err).squeeze())
             # print("lin_track_err[-1]", lin_track_err[-1].shape)
             # print("ang_track_err[-1]", ang_track_err[-1].shape)
 
@@ -159,6 +170,7 @@ def main():
 
     lin_track_err = np.array(lin_track_err)
     ang_track_err = np.array(ang_track_err)
+    raw_actions_list = np.array(raw_actions_list)
     proc_actions_list = np.array(proc_actions_list)
     q_log = np.array(q_log)
     qdot_log = np.array(qdot_log)
@@ -173,6 +185,7 @@ def main():
 
     np.save(os.path.join(log_root_path, run_name, "lin_track_err.npy"), lin_track_err)
     np.save(os.path.join(log_root_path, run_name, "ang_track_err.npy"), ang_track_err)
+    np.save(os.path.join(log_root_path, run_name, "actions.npy"), raw_actions_list)
     np.save(os.path.join(log_root_path, run_name, "q_ref.npy"), proc_actions_list)
     np.save(os.path.join(log_root_path, run_name, "q.npy"), q_log)
     np.save(os.path.join(log_root_path, run_name, "qdot.npy"), qdot_log)
