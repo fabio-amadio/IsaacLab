@@ -3,6 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+from isaaclab.envs import ViewerCfg
 from isaaclab.managers import RewardTermCfg as RewTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import CurriculumTermCfg as CurrTerm
@@ -432,6 +433,14 @@ class KangarooCurriculumCfg:
 
 
 @configclass
+class KangarooViewerCfg(ViewerCfg):
+    # HD: 1280 x 720; Full HD: 1920 x 1080; 4K: 3840 x 2160
+    resolution: tuple[int, int] = (1920, 1080)
+    # Default: (7.5, 7.5, 7.5) 
+    eye: tuple[float, float, float] = (10, 10, 10) 
+
+
+@configclass
 class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     rewards: KangarooRewards = KangarooRewards()
     actions: KangarooActionsCfg = KangarooActionsCfg()
@@ -439,15 +448,21 @@ class KangarooRoughEnvCfg(LocomotionVelocityRoughEnvCfg):
     terminations: KangarooTerminationsCfg = KangarooTerminationsCfg()
     events: KangarooEventCfg = KangarooEventCfg()
     curriculum: KangarooCurriculumCfg = KangarooCurriculumCfg()
+    viewer: KangarooViewerCfg = KangarooViewerCfg()
 
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
         # Scene
         self.scene.num_envs = 2048
-        self.scene.robot = KANGAROO_MINIMAL_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+        self.scene.robot = KANGAROO_MINIMAL_CFG.replace(
+            prim_path="{ENV_REGEX_NS}/Robot"
+        )
         self.scene.height_scanner.prim_path = "{ENV_REGEX_NS}/Robot/torso"
         self.scene.terrain.terrain_generator = SIMPLE_ROUGH_TERRAINS_CFG
+
+        self.commands.base_velocity.debug_vis = False
+        # self.commands.base_velocity.rel_standing_envs = 0.0
 
         # no height scan
         self.scene.height_scanner = None
