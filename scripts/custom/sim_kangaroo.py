@@ -223,7 +223,7 @@ def main():
     qdot_log = []
 
     count = 0
-    max_steps = env_cfg.episode_length_s / (env_cfg.sim.dt * env_cfg.decimation)
+    max_steps = env_cfg.episode_length_s * 1000 / (env_cfg.sim.dt * env_cfg.decimation)
     # simulate environment
     while simulation_app.is_running() and count < max_steps:
         # run everything in inference mode

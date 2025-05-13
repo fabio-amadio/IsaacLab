@@ -66,4 +66,3 @@ _build
 **/*.csv
 **/*.npy
 **/*.txt
-source/isaaclab_assets/data/Robots/PAL/Kangaroo/kangaroo_simplified_collision_v2.usd
